@@ -45,11 +45,10 @@
       const layers = KINDS.map((k, li) => `
         <div class="layer layer--${k}" data-i="${li}">
           <div class="layer__plate">${DK.projectImg(p, k)}</div>
-          <div class="layer__tag" style="top:${[72, 46, 20][li]}%">
-            <span class="layer__lead"></span>
-            <span class="mono layer__name">${pad2(li + 1)}<span class="layer__full"> ${KIND_NAMES[k]}</span></span>
-          </div>
+          <i class="layer__anchor" style="top:${[74, 50, 26][li]}%"></i>
         </div>`).join("");
+      const tags = KINDS.map((k, li) =>
+        `<span class="tag"><span class="mono tag__code">${pad2(li + 1)}</span><span class="tag__lead"></span></span>`).join("");
       return `
       <article class="scene" id="project-${p.slug}" aria-labelledby="pn-${p.slug}">
         <div class="wrap scene__inner">
@@ -71,8 +70,9 @@
           <div class="scene__stage">
             <div class="stage" aria-hidden="false">
               <div class="stack">${layers}</div>
+              <div class="stage__tags" aria-hidden="true">${tags}</div>
             </div>
-            <p class="scene__fig mono">Fig. ${pad2(i + 3)} — ${esc(p.name)}, exploded view<span class="scene__legend"> · 01 Wireframe · 02 User flow · 03 Final UI</span></p>
+            <p class="scene__fig mono">Fig. ${pad2(i + 3)} — ${esc(p.name)}, exploded view · <span class="scene__legend">01 Wireframe · 02 User flow · 03 Final UI</span></p>
           </div>
         </div>
       </article>`;
@@ -467,10 +467,13 @@
     const GAP = desktop ? 120 : 60;
 
     $$(".scene").forEach((scene) => {
+      const stage = $(".stage", scene);
       const stack = $(".stack", scene);
       const layers = $$(".layer", scene);
       const plates = $$(".layer__plate", scene);
-      const tags = $$(".layer__tag", scene);
+      const anchors = $$(".layer__anchor", scene);
+      const tagLayer = $(".stage__tags", scene);
+      const tags = $$(".tag", scene);
 
       // p: 0 → 1 across the pinned scroll.
       // 0–.45 layers pull apart along Z; .58–1 the stack rotates flat.
@@ -481,31 +484,52 @@
         const rz = -35 * (1 - b);
         const s = 0.9 + 0.1 * b;
         // the exploded stack rises on screen; push it down to stay centred
-        const lift = a * GAP * 0.85 * (1 - b);
+        const lift = a * GAP * 0.5 * (1 - b);
         stack.style.transform = `translateY(${lift.toFixed(1)}px) rotateZ(${rz.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg) scale(${s.toFixed(3)})`;
         layers.forEach((L, i) => {
           const z = (i * 1.5 + a * GAP * i) * (1 - b);
           L.style.transform = `translateZ(${z.toFixed(1)}px)`;
         });
-        // fade the plates, not the layers: opacity on a layer would flatten its 3D children
+        // fade the plates, not the layers: opacity on a layer would flatten the 3D stack
         plates.forEach((P, i) => { P.style.opacity = i < 2 ? (1 - b).toFixed(3) : "1"; });
+
+        // Callouts live in a flat overlay, pinned to each layer's projected anchor point,
+        // so they always face the viewer and are never hidden behind a layer.
         const tagAlpha = clamp01(a * 1.4 - 0.2) * (1 - clamp01(b * 1.6));
-        const inv = `scale(${(1 / s).toFixed(3)}) rotateX(${(-rx).toFixed(2)}deg) rotateZ(${(-rz).toFixed(2)}deg)`;
-        tags.forEach((t) => {
-          t.style.opacity = tagAlpha.toFixed(3);
-          t.style.transform = inv;
-        });
+        tagLayer.style.opacity = tagAlpha.toFixed(3);
+        if (tagAlpha > 0.001) {
+          const sr = stage.getBoundingClientRect();
+          anchors.forEach((an, i) => {
+            const r = an.getBoundingClientRect();
+            tags[i].style.transform = `translate(${(r.left - sr.left).toFixed(1)}px, ${(r.top - sr.top).toFixed(1)}px) translate(-100%, -50%)`;
+          });
+        }
       };
       render(0);
 
       const proxy = { p: 0 };
+      window.addEventListener("resize", () => render(proxy.p));
       gsap.to(proxy, {
         p: 1,
         ease: "none",
         onUpdate: () => render(proxy.p),
         scrollTrigger: desktop
-          ? { trigger: scene, start: "top top", end: "+=130%", pin: true, scrub: 0.6, anticipatePin: 1 }
-          : { trigger: $(".stage", scene), start: "top 85%", end: "bottom 30%", scrub: 0.6 }
+          ? {
+              trigger: scene,
+              // pin the scene centred in the space below the header
+              start: () => {
+                const head = $(".site-header").offsetHeight;
+                return scene.offsetHeight > window.innerHeight - head
+                  ? `top top+=${head}`
+                  : `center ${Math.round((window.innerHeight + head) / 2)}px`;
+              },
+              end: "+=110%",
+              pin: true,
+              scrub: 0.8,
+              anticipatePin: 1,
+              invalidateOnRefresh: true
+            }
+          : { trigger: $(".stage", scene), start: "top 85%", end: "bottom 35%", scrub: 0.8 }
       });
 
       const num = $(".scene__metric-num", scene);
@@ -513,47 +537,100 @@
     });
   }
 
-  function initProcess() {
-    const section = $(".process");
+  // Process cards. Desktop: pinned horizontal scroll with a 3D tilt.
+  // Mobile, reduced motion or no GSAP: a native swipe row with scroll snap.
+  function processParts() {
     const viewport = $(".process__viewport");
     const track = $(".process__track");
     const cards = $$(".step", track);
-
-    const tilt = () => {
-      const vw = window.innerWidth;
-      cards.forEach((c) => {
-        const r = c.getBoundingClientRect();
-        const d = Math.max(-1.6, Math.min(1.6, (r.left + r.width / 2 - vw / 2) / (vw / 2)));
-        c.style.transform = `translateZ(${(-Math.abs(d) * 80).toFixed(1)}px) rotateY(${(-d * 26).toFixed(2)}deg)`;
-      });
+    const count = $(".process__count");
+    const bar = $(".process__bar span");
+    let current = -1;
+    const setCurrent = (i) => {
+      if (i === current) return;
+      current = i;
+      cards.forEach((c, k) => c.classList.toggle("is-current", k === i));
+      count.textContent = `${pad2(i + 1)} / ${pad2(cards.length)}`;
     };
+    const setBar = (p) => { bar.style.transform = `scaleX(${clamp01(p).toFixed(4)})`; };
+    return { section: $(".process"), viewport, track, cards, setCurrent, setBar };
+  }
 
+  function initProcessSwipe() {
+    const { viewport, cards, setCurrent, setBar } = processParts();
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const max = viewport.scrollWidth - viewport.clientWidth;
+      const left = viewport.scrollLeft;
+      setBar(max > 0 ? left / max : 0);
+      if (max > 0 && left >= max - 2) return setCurrent(cards.length - 1);
+      const origin = cards[0].offsetLeft;
+      let best = 0, bestD = Infinity;
+      cards.forEach((c, i) => {
+        const d = Math.abs(c.offsetLeft - origin - left);
+        if (d < bestD) { bestD = d; best = i; }
+      });
+      setCurrent(best);
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    viewport.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    update();
+    return () => {
+      viewport.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }
+
+  function initProcess() {
+    const { section, viewport, track, cards, setCurrent, setBar } = processParts();
     const mm = gsap.matchMedia();
+
     mm.add("(min-width: 900px)", () => {
       section.classList.add("is-pinned");
-      const dist = () => Math.max(0, track.scrollWidth - document.documentElement.clientWidth);
+      let centers = [];
+      const measure = () => { centers = cards.map((c) => c.offsetLeft + c.offsetWidth / 2); };
+      const dist = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+
+      // Reads only cached positions and the tween's own x, so no layout work per frame.
+      const render = () => {
+        const x = gsap.getProperty(track, "x");
+        const vw = viewport.clientWidth;
+        cards.forEach((c, i) => {
+          const raw = (centers[i] + x - vw / 2) / (vw * 0.65);
+          const e = Math.sin(Math.max(-1, Math.min(1, raw)) * Math.PI / 2);
+          c.style.transform = `translate3d(0, 0, ${(-Math.abs(e) * 60).toFixed(1)}px) rotateY(${(-e * 14).toFixed(2)}deg)`;
+        });
+        const D = dist();
+        const progress = D ? clamp01(-x / D) : 0;
+        setBar(progress);
+        setCurrent(Math.round(progress * (cards.length - 1)));
+      };
+
+      measure();
       gsap.to(track, {
         x: () => -dist(),
         ease: "none",
+        onUpdate: render,
         scrollTrigger: {
           trigger: section,
           start: "top top",
           end: () => "+=" + dist(),
           pin: true,
-          scrub: 0.6,
+          scrub: 0.8,
           invalidateOnRefresh: true,
-          onUpdate: tilt,
-          onRefresh: tilt
+          onRefresh: () => { measure(); render(); }
         }
       });
-      tilt();
-      return () => section.classList.remove("is-pinned");
+      render();
+      return () => {
+        section.classList.remove("is-pinned");
+        cards.forEach((c) => { c.style.transform = ""; });
+      };
     });
-    mm.add("(max-width: 899px)", () => {
-      viewport.addEventListener("scroll", tilt, { passive: true });
-      tilt();
-      return () => viewport.removeEventListener("scroll", tilt);
-    });
+
+    mm.add("(max-width: 899px)", () => initProcessSwipe());
   }
 
   function initTimeline() {
@@ -601,6 +678,7 @@
     const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
     fontsReady.then(() => ScrollTrigger.refresh());
   } else {
+    initProcessSwipe();
     DK.scrollToHash && DK.scrollToHash();
   }
 })();

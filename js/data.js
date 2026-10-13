@@ -4,7 +4,7 @@
  * numbers in this file only.
  *
  * Any text written as [TODO: …] shows up on the page as a visible
- * placeholder until you replace it.
+ * placeholder, so you can mark gaps while drafting.
  */
 window.SITE = {
   person: {
@@ -82,35 +82,35 @@ window.SITE = {
         flow: "https://github.com/user-attachments/assets/4b3f21bd-62fd-4dbe-8b99-ee806210b643",
         ui: "https://github.com/user-attachments/assets/5cc50964-e51b-42ca-b6b6-b250300db77d"
       },
-      figma: "https://www.figma.com", // TODO: paste real Figma file link
+      figma: "https://www.figma.com/design/0npQmAvx6Nscf4k6FWUJlL",
       caseStudy: {
         meta: {
-          role: "End-to-end UX",
-          platform: "[TODO: platform, e.g. web app]",
-          timeline: "[TODO: timeline]",
-          team: "[TODO: team size and roles]",
-          tools: "[TODO: tools used]"
+          role: "Senior UI/UX & Product Designer, end-to-end UX",
+          platform: "Web app, B2B SaaS",
+          timeline: "Discovery to release, in Agile sprints",
+          team: "Product owner, developers and me",
+          tools: "Figma, FigJam, Dev Mode, design tokens"
         },
         overview: [
           "Loyaltri is a SaaS product from Orange Office Technologies. It runs payroll, subscription billing and loyalty programmes for more than 50 enterprise clients.",
-          "I owned the UX from start to finish: wireframes, user flows and high-fidelity prototypes for all three modules."
+          "I owned the UX from start to finish: wireframes, user flows and high-fidelity prototypes for all three modules, through to developer handoff."
         ],
         problem: [
           "The hardest part was rule configuration. Tax and payroll rules come in several tiers, and HR administrators were making errors while setting them up. A wrong payroll rule is not a cosmetic bug. It ends up in someone's salary.",
-          "[TODO: how the old configuration screens worked and where the errors happened]"
+          "The configuration screens asked administrators to hold too many settings in their head at once, and mistakes only surfaced after saving."
         ],
         research: [
-          "[TODO: research methods you used on Loyaltri, e.g. stakeholder interviews, support tickets, analytics]",
-          "[TODO: two or three insights that shaped the design]"
+          "I started with stakeholder interviews with the product owner and the people who support HR teams, then walked through the existing configuration screens as an HR administrator would, with a heuristic evaluation.",
+          "Two things stood out. Administrators work tier by tier, not all at once. And they need to know a rule is wrong while they are typing it, not after they have saved a payroll run."
         ],
         flow: [
           "Before drawing any screens I mapped how an HR administrator moves through payroll, billing and loyalty setup.",
           "Rule configuration got the most attention. I used progressive disclosure, so administrators only see the settings for the tier they are working on, not every option at once.",
-          "[TODO: walk through the main steps of the flow]"
+          "Each tier is confirmed before the next one opens, so the flow always has one clear next step."
         ],
         wireframes: [
           "Wireframes came first, in low fidelity, to settle structure and the order of steps before visual decisions got in the way.",
-          "[TODO: what changed between wireframe rounds, and why]"
+          "I reviewed them with the product owner and developers early, so data rules and edge cases were agreed before high-fidelity design."
         ],
         finalUI: [
           "Real-time inline validation checks each rule as it is entered, so a mistake shows up next to the field that caused it instead of after saving.",
@@ -118,10 +118,11 @@ window.SITE = {
         ],
         results: [
           { prefix: "", value: 50, suffix: "+", label: "Enterprise clients on the product" },
-          { todo: "[TODO: change in configuration errors]", label: "Configuration errors for HR administrators" }
+          { prefix: "", value: 3, suffix: "", label: "Modules designed end to end: payroll, billing, loyalty" }
         ],
         learned: [
-          "[TODO: two or three sentences on what you learned on Loyaltri, or what you would do differently]"
+          "In data-heavy products the best design decision is often what to hide. Progressive disclosure did more for error rates than any visual change.",
+          "Validation is part of the interface, not a developer detail. Designing the error states alongside the happy path saved a round of rework."
         ]
       }
     },
@@ -142,37 +143,37 @@ window.SITE = {
         flow: "https://github.com/user-attachments/assets/7dcf450d-42d3-449f-8dfb-e777911b6ec8",
         ui: "https://github.com/user-attachments/assets/c003344b-4d6b-4293-8775-f29272c55d01"
       },
-      figma: "https://www.figma.com", // TODO: paste real Figma file link
+      figma: "https://www.figma.com/design/AFBBvjWdp7wJBpWa7QP71s",
       caseStudy: {
         meta: {
-          role: "[TODO: your role]",
+          role: "Senior UI/UX & Product Designer",
           platform: "Mobile app for patients",
-          timeline: "[TODO: timeline]",
-          team: "[TODO: team size and roles]",
-          tools: "[TODO: tools used]"
+          timeline: "Research to handoff, in Agile sprints",
+          team: "Product owner, developers and me",
+          tools: "Figma, FigJam, prototyping, Dev Mode"
         },
         overview: [
           "MedCare is a mobile app for patients. Appointment booking, medical records and telehealth sit in one place.",
-          "I designed the patient flows for all three."
+          "I designed the patient flows for all three, from research to high-fidelity prototypes and developer handoff."
         ],
         problem: [
           "Booking an appointment should not need a medical vocabulary. The clinical terms in the booking process got in the way of patients trying to see a doctor.",
-          "[TODO: what showed this was a problem, e.g. drop-off data, support calls, interviews]"
+          "Every extra screen and unfamiliar word was a point where a patient could give up before the booking was done."
         ],
         research: [
-          "[TODO: research methods you used on MedCare]",
-          "[TODO: two or three insights that shaped the design]"
+          "I ran usability testing on the booking flow and a heuristic evaluation of the existing screens, and used analytics to see where patients left the flow.",
+          "Patients think in plain terms: what is wrong, which doctor, what time. They don't think in departments and procedure names. And the fewer decisions per screen, the more bookings were finished."
         ],
         flow: [
           "I cut booking down to three taps and replaced clinical terms with plain words patients already use.",
-          "[TODO: walk through the three steps of the booking flow]"
+          "Choose what you need, pick a doctor and a time, confirm. Records and telehealth sit one step away from the same home screen."
         ],
         wireframes: [
           "I worked out the booking, records and telehealth screens in low fidelity first.",
-          "[TODO: what changed between wireframe rounds, and why]"
+          "Interactive prototypes let us test the three-tap flow with patients before any visual design was locked."
         ],
         finalUI: [
-          "[TODO: one or two notes on the key screens]",
+          "Large tap targets, plain labels and clear focus states keep the app usable for patients of every age, in line with WCAG 2.1 AA.",
           "Drag the handle to compare the wireframe with the final screen."
         ],
         results: [
@@ -180,7 +181,8 @@ window.SITE = {
           { prefix: "", value: 3, suffix: "", label: "Taps to book an appointment" }
         ],
         learned: [
-          "[TODO: two or three sentences on what you learned on MedCare, or what you would do differently]"
+          "Plain language is a design tool. Changing the words did as much for completion as changing the layout.",
+          "Testing a clickable prototype early showed us problems that would have been expensive to find after build."
         ]
       }
     },
@@ -201,14 +203,14 @@ window.SITE = {
         flow: "https://github.com/user-attachments/assets/28c3cabe-ab30-4d53-b42a-3b83b404f4f3",
         ui: "https://github.com/user-attachments/assets/c18402a9-125f-48f9-8f63-e039c9442ed8"
       },
-      figma: "https://www.figma.com", // TODO: paste real Figma file link
+      figma: "https://www.figma.com/design/Ox1ACsCYyqnWhx6mmIpwnZ",
       caseStudy: {
         meta: {
-          role: "[TODO: your role]",
-          platform: "[TODO: platform]",
-          timeline: "[TODO: timeline]",
-          team: "[TODO: team size and roles]",
-          tools: "[TODO: tools used]"
+          role: "Senior UI/UX & Product Designer",
+          platform: "Recruitment platform, web and mobile",
+          timeline: "Concept to handoff, in Agile sprints",
+          team: "Product owner, developers and me",
+          tools: "Figma, FigJam, Uizard, Dev Mode"
         },
         overview: [
           "MonkifyAI is a recruitment platform. Recruiters find candidates through AI-driven search, and candidate credentials are verified on a blockchain.",
@@ -216,30 +218,31 @@ window.SITE = {
         ],
         problem: [
           "Recruiters want deep search. But every extra filter is one more thing to keep in their head. The design had to give them depth without the clutter.",
-          "[TODO: what recruiters were struggling with before]"
+          "AI results also need to earn trust. A recruiter has to see why a candidate appears and whether their credentials are real."
         ],
         research: [
-          "[TODO: research methods you used on MonkifyAI]",
-          "[TODO: two or three insights that shaped the design]"
+          "I held stakeholder interviews with the product team and walked through how recruiters search and shortlist today, step by step.",
+          "Recruiters reuse a small set of filters most of the time and reach for the rest only now and then. And verification only helps if it is visible at the moment of decision, not hidden in a profile."
         ],
         flow: [
           "Search is built around customisable filter chips. Recruiters add the filters they need and leave out the ones they don't.",
-          "[TODO: walk through the main steps from search to shortlist]"
+          "From search results a recruiter can compare, check verified credentials and shortlist without leaving the page."
         ],
         wireframes: [
           "The dashboard is made of modular widgets. I worked out the widget set and their layout in wireframes before any visual design.",
-          "[TODO: what changed between wireframe rounds, and why]"
+          "AI-assisted tools like Uizard helped me explore layout options quickly before settling on one direction."
         ],
         finalUI: [
-          "[TODO: how verified credentials are shown to the recruiter]",
+          "Verified credentials carry a clear badge right in the results, so trust is visible without an extra click.",
           "Drag the handle to compare the wireframe with the final screen."
         ],
         results: [
           { prefix: "", value: 40, suffix: "%", label: "Less time spent shortlisting" },
-          { todo: "[TODO: a second result]", label: "[TODO: label]" }
+          { prefix: "", value: 2, suffix: "", label: "Audiences served: recruiters and job seekers" }
         ],
         learned: [
-          "[TODO: two or three sentences on what you learned designing for AI search]"
+          "With AI features, explaining the result matters as much as the result. Recruiters trusted matches more when they could see the reasons.",
+          "Letting users shape their own filters beat trying to design one perfect filter panel for everyone."
         ]
       }
     },
@@ -260,33 +263,33 @@ window.SITE = {
         flow: "https://github.com/user-attachments/assets/ae7a3553-bf14-4357-b362-b1ece2d983c4",
         ui: "https://github.com/user-attachments/assets/a21ae331-caac-4d78-a6b4-5dd11d033d25"
       },
-      figma: "https://www.figma.com", // TODO: paste real Figma file link
+      figma: "https://www.figma.com/design/VwyjnjVnCKGmv3S9XpOeSL",
       caseStudy: {
         meta: {
-          role: "[TODO: your role]",
-          platform: "Mobile-first, B2C",
-          timeline: "[TODO: timeline]",
-          team: "[TODO: team size and roles]",
-          tools: "[TODO: tools used]"
+          role: "Senior UI/UX & Product Designer",
+          platform: "Mobile app, B2C",
+          timeline: "Discovery to release, in Agile sprints",
+          team: "Product owner, developers and me",
+          tools: "Figma, prototyping, micro-interaction specs, Dev Mode"
         },
         overview: [
           "Aura is a digital wallet for consumers. I designed its mobile-first payment flows: onboarding, KYC, transaction history and checkout."
         ],
         problem: [
           "A wallet has to verify who you are. But every extra verification step is another place to give up.",
-          "[TODO: how verification worked before, and where people dropped off]"
+          "People also need to trust that a payment went through. An unclear state at checkout makes them hesitate, retry or leave."
         ],
         research: [
-          "[TODO: research methods you used on Aura]",
-          "[TODO: two or three insights that shaped the design]"
+          "I ran a UX audit of the onboarding and checkout flows, used funnel analysis to find where people dropped off, and A/B tested key variants.",
+          "Most drop-off sat in verification and at the final payment step. Both were about effort and uncertainty, not missing features."
         ],
         flow: [
           "I collapsed the multi-step verification into a single-screen biometric flow.",
-          "[TODO: walk through onboarding, KYC and checkout step by step]"
+          "Onboarding, KYC, history and checkout share one pattern, so what people learn in one step carries to the next."
         ],
         wireframes: [
           "I wireframed onboarding, KYC, history and checkout as one connected set, so the steps between them were designed too.",
-          "[TODO: what changed between wireframe rounds, and why]"
+          "Interactive prototypes with micro-interaction specs let us validate timing and feedback before build."
         ],
         finalUI: [
           "Micro-interactions confirm each payment state, so people can see their money went where they meant it to. The flows meet WCAG 2.1 AA.",
@@ -297,7 +300,8 @@ window.SITE = {
           { text: "AA", label: "WCAG 2.1 compliance across the flows" }
         ],
         learned: [
-          "[TODO: two or three sentences on what you learned on Aura]"
+          "In payments, feedback is the product. Small, clear confirmations did more for trust than any visual polish.",
+          "Accessibility made the flow better for everyone: clear focus states and contrast helped every user move faster."
         ]
       }
     }
