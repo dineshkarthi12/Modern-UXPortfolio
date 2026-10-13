@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinesh Kumar — Senior UI/UX Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0A0A09;
+    --bg2: #10100F;
+    --bg3: #161614;
+    --gold: #D4AF37;
+    --gold2: #F3E5AB;
+    --text: #F5F4F0;
+    --muted: #A3A19A;
+    --subtle: #5C5B57;
+    --border: rgba(212,175,55,0.12);
+    --border2: rgba(212,175,55,0.06);
+    --radius: 14px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+  /* ── SMOOTH GLOW DISSOLVE OVERLAY ── */
+  #unlock-glow-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, rgba(212,175,55,0.04) 40%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    display: none;
+    transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ── SPARKLE CANVAS LAYER ── */
+  #sparkle-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    pointer-events: none;
+  }
+
+  /* ── FUTURISTIC LOGIN GATE OVERLAY ── */
+  #login-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #060605;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .gate-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+  }
+  .gate-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(212,175,55,0.05);
+    border: 1px solid var(--gold);
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .gate-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  .gate-sub {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 32px;
+  }
+  .gate-input-wrapper {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 30px;
+    padding: 10px 20px;
+    margin-bottom: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+  .gate-input-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--subtle);
+  }
+  .gate-input-val {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* ── SWIPE RAIL COMPONENT ── */
+  .swipe-track {
+    position: relative;
+    width: 100%;
+    height: 52px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+  .swipe-text {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    pointer-events: none;
+    z-index: 1;
+    background: linear-gradient(90deg, var(--muted) 0%, var(--text) 50%, var(--muted) 100%);
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: textShimmer 2.5s infinite linear;
+  }
+  .swipe-handle {
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 44px; height: 44px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: grab; z-index: 2;
+    box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+    transition: transform 0.1s ease-out;
+  }
+  .swipe-handle:active { cursor: grabbing; background: var(--gold2); }
+  .swipe-handle svg { width: 16px; height: 16px; fill: var(--bg); }
+
+  @keyframes textShimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+  }
+
+  /* ── NAVIGATION HEADER ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 48px;
+    background: rgba(10,10,9,0.85);
+    backdrop-blur: blur(20px);
+    border-bottom: 1px solid var(--border2);
+    transition: padding 0.3s;
+  }
+  nav.scrolled { padding: 12px 48px; }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-weight: 500;
+  }
+  .nav-cta:hover { background: var(--gold); color: var(--bg); }
+
+  /* ── HERO SECTION ── */
+  #hero {
+    min-height: auto;
+    padding: 110px 48px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 40% 40% at 85% 30%, rgba(212,175,55,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 6vw, 76px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    color: var(--text);
+  }
+  .hero-name em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 400;
+  }
+  .hero-tagline {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 12px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    max-width: 640px;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .hero-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .hero-stat-num sup { font-size: 14px; vertical-align: super; }
+  .hero-stat-label {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 36px 48px; }
+  .sec-inner { max-width: 1000px; margin: 0 auto; }
+
+  .sec-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .sec-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    font-style: italic;
+    opacity: 0.8;
+  }
+  .sec-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .sec-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* ── ABOUT ME ── */
+  #about { background: var(--bg2); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .about-text p {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .about-text p + p { margin-top: 12px; }
+  .about-highlight {
+    color: var(--gold2);
+    font-weight: 500;
+  }
+  .about-details { display: flex; flex-direction: column; gap: 8px; }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg3);
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+  }
+  .detail-key {
+    font-size: 8.5px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--subtle);
+  }
+  .detail-val {
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── EXPERIENCE TIMELINE ── */
+  #experience { background: var(--bg); }
+  .exp-timeline { position: relative; }
+  .exp-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 6px; bottom: 6px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+  }
+  .exp-item {
+    padding-left: 24px;
+    padding-bottom: 28px;
+    position: relative;
+  }
+  .exp-item:last-child { padding-bottom: 4px; }
+  .exp-item::before {
+    content: '';
+    position: absolute;
+    left: -4px; top: 6px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 10px rgba(212,175,55,0.4);
+  }
+  .exp-period {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .exp-company {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .exp-role-title {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .exp-pts { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .exp-pts li {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+    font-weight: 300;
+  }
+  .exp-pts li::before {
+    content: '✦';
+    position: absolute;
+    left: 0; color: var(--gold);
+    font-size: 7px; top: 2px;
+  }
+
+  /* ── DESIGN HUB MATRIX ── */
+  #projects { background: var(--bg2); }
+  .proj-hint {
+    text-align: center;
+    font-size: 9.5px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .proj-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .proj-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+  }
+  .proj-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(212,175,55,0.35);
+  }
+  .proj-design-hub {
+    position: relative;
+    width: 100%;
+    margin-bottom: 6px;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: #080808;
+    border: 1px solid rgba(255,255,255,0.02);
+    cursor: pointer;
+  }
+  .proj-design-hub::after {
+    content: '🔎 Click to Preview';
+    position: absolute;
+    inset: 0;
+    background: rgba(10,10,9,0.75);
+    color: var(--gold2);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .proj-design-hub:hover::after { opacity: 1; }
+
+  .hub-viewport {
+    width: 100%; height: 100%;
+    padding: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.4s ease;
+  }
+  .ui-mock-frame {
+    width: 100%; height: 100%;
+    border-radius: 6px; padding: 12px;
+    font-family: 'Outfit', sans-serif;
+    display: flex; flex-direction: column; justify-content: space-between;
+    font-size: 10px;
+  }
+  .hub-switcher {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    padding: 2px;
+    border-radius: 30px;
+    margin: 10px auto;
+    width: 100%; max-width: 300px;
+  }
+  .hub-btn {
+    flex: 1; background: transparent; border: none;
+    color: var(--muted); font-size: 8px; letter-spacing: 1px;
+    text-transform: uppercase; padding: 5px 0; border-radius: 20px;
+    cursor: pointer; transition: all 0.3s; font-weight: 600;
+  }
+  .hub-btn.active { background: var(--gold); color: var(--bg); }
+
+  .proj-icon-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; padding-top: 6px; border-top: 1px dashed var(--border2);
+  }
+  .proj-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(212,175,55,0.04); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .proj-icon svg { width: 12px; height: 12px; stroke: var(--gold); fill: none; }
+  .proj-count-label { font-size: 9px; color: var(--gold2); font-weight: 500; }
+  .proj-title { font-size: 16px; font-weight: 600; margin-bottom: 2px; color: var(--text); }
+  .proj-company { font-size: 10px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; font-weight: 500; }
+  .proj-desc { font-size: 12px; color: var(--muted); line-height: 1.5; font-weight: 300; }
+
+  /* ── CAPABILITIES MATRIX ── */
+  #skills { background: var(--bg); }
+  .skills-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .skill-card {
+    background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius);
+    padding: 18px 22px;
+  }
+  .skill-cat-label {
+    font-size: 9.5px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 10px; font-weight: 600;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; padding: 4px 10px; border: 1px solid var(--border);
+    border-radius: 20px; color: var(--muted);
+  }
+
+  /* ── METRICS LOGS ── */
+  #achievements { background: var(--bg2); }
+  .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ach-card {
+    display: flex; gap: 14px; align-items: flex-start; padding: 18px;
+    background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius);
+  }
+  .ach-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--gold); line-height: 1; }
+  .ach-num sup { font-size: 12px; vertical-align: super; }
+  .ach-text { font-size: 12px; color: var(--muted); line-height: 1.5; font-weight: 300; }
+  .ach-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── AI MATRIX WORKFLOWS ── */
+  #ai-matrix { background: var(--bg2); }
+  .ai-workflow-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 10px;
+  }
+  .ai-card {
+    background: var(--bg3);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    position: relative;
+  }
+  .ai-badge {
+    position: absolute; top: 20px; right: 20px;
+    font-size: 8px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; background: rgba(212,175,55,0.08);
+    color: var(--gold); padding: 3px 8px; border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .ai-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .ai-desc { font-size: 12.5px; color: var(--muted); font-weight: 300; line-height: 1.6; }
+
+  /* ── CONTACT SECTION ── */
+  #contact { background: var(--bg); }
+  .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .contact-tagline { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+  .contact-tagline em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .contact-sub { font-size: 13px; color: var(--muted); font-weight: 300; }
+  .contact-items { display: flex; flex-direction: column; gap: 10px; }
+  .contact-row {
+    display: flex; align-items: center; gap: 14px; padding: 12px 18px;
+    background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px;
+    transition: border-color 0.3s;
+  }
+  .contact-row:hover { border-color: var(--border); }
+  .contact-icon {
+    width: 32px; height: 32px; border-radius: 6px; background: rgba(212,175,55,0.06);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .contact-icon svg { width: 14px; height: 14px; stroke: var(--gold); fill: none; }
+  .contact-val { font-size: 13px; color: var(--text); font-weight: 400; }
+  .contact-key { font-size: 9px; color: var(--subtle); text-transform: uppercase; margin-top: 1px; tracking: 0.5px; }
+
+  /* ── LIGHTBOX OVERLAY PREVIEW ── */
+  #preview-modal {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(6,6,5,0.95); backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px); align-items: center; justify-content: center;
+    padding: 24px; opacity: 0; transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #modal-content-box {
+    width: 100%; max-width: 720px; aspect-ratio: 16 / 10; background: #090909;
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 32px;
+    display: flex; align-items: center; justify-content: center;
+    transform: scale(0.92); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  #modal-close-btn {
+    position: absolute; top: -40px; right: 0; background: transparent;
+    border: 1px solid var(--gold); color: var(--gold); padding: 4px 12px;
+    border-radius: 20px; cursor: pointer; font-size: 8.5px; font-weight: 600; text-transform: uppercase;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width: 850px) {
+    nav { padding: 12px 20px; }
+    .nav-links { display: none; }
+    section { padding: 28px 20px; }
+    #hero { padding: 90px 20px 20px; }
+    .hero-stats { gap: 16px; flex-wrap: wrap; }
+    .about-grid, .proj-grid, .skills-layout, .ach-grid, .contact-wrap, .ai-workflow-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CHOREOGRAPHED BACKGROUND RADIANT LAYER -->
+<div id="unlock-glow-flash"></div>
+
+<!-- HIGH-VELOCITY LOVE SPARKLE CANVAS LAYER -->
+<canvas id="sparkle-canvas"></canvas>
+
+<!-- SECURE TERMINAL IDENTITY LOGIN GATE ENTRY HUB -->
+<div id="login-gate">
+  <div class="gate-card">
+    <div class="gate-avatar">DK</div>
+    <h2 class="gate-name">DINESH KUMAR</h2>
+    <p class="gate-sub">Senior UI/UX Designer</p>
+    
+    <div class="gate-input-wrapper">
+      <div>
+        <div class="gate-input-label">Identity Profile</div>
+        <div class="gate-input-val">Dinesh Kumar</div>
+      </div>
+      <span style="color: var(--gold); font-size: 12px;">🔒</span>
+    </div>
+    
+    <!-- SLIDE TO UNLOCK SWIPE RAIL MODULE -->
+    <div class="swipe-track" id="swipe-track">
+      <div class="swipe-text">Swipe to Unlock</div>
+      <div class="swipe-handle" id="swipe-handle">
+        <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CORE PORTFOLIO STREAMS CONTAINER -->
+<div id="main-portfolio-wrapper" style="opacity: 0; transform: scale(0.97); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);">
+
+  <div id="preview-modal">
+    <div id="modal-content-box">
+      <button id="modal-close-btn">Close Frame</button>
+      <div id="modal-viewport-target" style="width:100%; height:100%;"></div>
+    </div>
+  </div>
+
+  <nav id="navbar">
+    <div class="nav-logo">DK.UX</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#projects">Studio</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#ai-matrix">AI Matrix</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div style="display: flex; gap: 8px; align-items: center;">
+    <a href="https://drive.google.com/file/d/1zB2gQJ9xM1Hx71qfr5chB7dFA8rZCTX5/view?usp=drivesdk" target="_blank" class="nav-cta" style="background: var(--gold); color: var(--bg);">Resume</a>
+    <a href="mailto:dineshkarthivel@gmail.com" class="nav-cta">Let's Talk</a>
+    </div>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div style="max-width:1000px; margin:0 auto; position:relative; z-index:1;">
+      <div class="hero-label">Senior UI/UX Designer &nbsp;·&nbsp; B2B &amp; B2C SaaS &nbsp;·&nbsp; Chennai</div>
+      <h1 class="hero-name">Dinesh<br><em>Kumar</em></h1>
+      <p class="hero-tagline">7+ years of digital product craft designing intuitive cross-platform ecosystems. Specializing in high-density SaaS logic, centralized design tokens, and scalable atomic components.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num" id="stat-0">0<sup>+</sup></div>
+          <div class="hero-stat-label">Years Experience</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" id="stat-1">0<sup>%</sup></div>
+          <div class="hero-stat-label">UI Inconsistency Cut</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" id="stat-2">0<sup>%</sup></div>
+          <div class="hero-stat-label">Task Success Boost</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" id="stat-3">0<sup>%</sup></div>
+          <div class="hero-stat-label">Dev Handoff Speed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="sec-inner">
+      <div class="sec-header">
+        <span class="sec-num">01 /</span>
+        <span class="sec-title">About Me</span>
+        <span class="sec-line"></span>
+      </div>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>I am a dynamic and detail-oriented <span class="about-highlight">Senior UI/UX Designer with 7+ years of experience (2019-2026)</span> engineering user-centric digital environments for responsive web platforms and complex mobile-first native applications.</p>
+          <p>My unique capability lies in the synthesis of structural analytics and meticulous interface design. Having a foundational background in <span class="about-highlight">B.E. Civil Engineering</span> gives me a rigorous, systematic approach toward constructing complex data hierarchies, executing modular layouts, and tracking design logic validation.</p>
+          <p>I focus intensely on establishing <span class="about-highlight">Atomic Design Systems</span>, maintaining WCAG 2.1 accessibility alignment, and leveraging AI-powered productivity tools to dramatically minimize engineering handoff pipelines while scaling business conversion matrices.</p>
+        </div>
+        <div class="about-details">
+          <div class="detail-row">
+            <span class="detail-key">Based In</span>
+            <span class="detail-val">Chennai, India</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Core Scope</span>
+            <span class="detail-val">B2B &amp; B2C SaaS Platforms</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Design System</span>
+            <span class="detail-val">Atomic Mechanics &amp; Tokens</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Compliance</span>
+            <span class="detail-val">WCAG 2.1 Accessibility</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Tech Stack</span>
+            <span class="detail-val">Figma · HTML · CSS · JS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="sec-inner">
+      <div class="sec-header">
+        <span class="sec-num">02 /</span>
+        <span class="sec-title">Professional Experience</span>
+        <span class="sec-line"></span>
+      </div>
+      <div class="exp-timeline">
+        <div class="exp-item">
+          <div class="exp-period">Sep 2020 — Present</div>
+          <div class="exp-company">Orange Office Technologies</div>
+          <div class="exp-role-title">Senior UI/UX Designer &amp; Web Developer</div>
+          <ul class="exp-pts">
+            <li>Led end-to-end UX architecture for multi-tenant SaaS platforms—from operational user discovery to high-fidelity Figma orchestration.</li>
+            <li>Engineered and scaled a systemic component framework with variables, reducing systemic layout discrepancies by 35%.</li>
+            <li>Conducted thorough heuristic evaluations and user behavior analytics on digital fintech wallets and complex clinician dashboards.</li>
+            <li>Optimized transaction success thresholds by 20% and reduced post-launch support ticket backlogs by 15%.</li>
+            <li>Maintained strict WCAG 2.1 cross-browser interface accessibility compliance layers for high-security fintech portals.</li>
+            <li>Utilized state-of-the-art generative AI systems (Adobe Firefly, Google Stitch, Uizard) to accelerate rapid internal UI asset generation workflows.</li>
+          </ul>
+        </div>
+        <div class="exp-item">
+          <div class="exp-period">Mar 2019 — Sep 2020</div>
+          <div class="exp-company">Qmax Technology Firm</div>
+          <div class="exp-role-title">UI/UX Designer &amp; Front-End Developer</div>
+          <ul class="exp-pts">
+            <li>Architected highly dense real-time analytical monitoring dashboards with advanced filtering paradigms, increasing user engagement metrics by 20%.</li>
+            <li>Formalized a structured codebase-aligned design library following Atomic Design principles, accelerating design-to-dev handoff velocity by 40%.</li>
+            <li>Constructed functional validation prototypes natively using semantic HTML5, CSS3, and modern interactive JavaScript.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="sec-inner">
+      <div class="sec-header">
+        <span class="sec-num">03 /</span>
+        <span class="sec-title">Design Studio: Case Files</span>
+        <span class="sec-line"></span>
+      </div>
+      <div class="proj-hint">Select workflow phases below to inspect the design lifecycle</div>
+      <div class="proj-grid">
+        
+        <!-- PROJECT CARD 1: LOYALTRI ECOSYSTEM -->
+        <div class="proj-card" id="proj-card-1">
+          <div class="proj-design-hub" onclick="triggerLightboxPreview(1)">
+            <div class="hub-viewport" id="viewport-1"></div>
+          </div>
+          <div class="hub-switcher">
+            <button class="hub-btn active" onclick="switchHubView(1, 'wireframe', this, event)">WIREFRAME</button>
+            <button class="hub-btn" onclick="switchHubView(1, 'flow', this, event)">USER FLOW</button>
+            <button class="hub-btn" onclick="switchHubView(1, 'ui', this, event)">FINAL UI</button>
+          </div>
+          <div class="proj-icon-row">
+            <div class="proj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M21 12H3M12 3v18"/></svg></div>
+            <span class="proj-count-label">SaaS Billing</span>
+          </div>
+          <div class="proj-title">Loyaltri Ecosystem</div>
+          <div class="proj-company">Orange Office Technologies</div>
+          <div class="proj-desc">End-to-end design layout of payroll compliance metrics, corporate billing subscriptions, and customizable merchant rule engines utilized across 50+ enterprise spaces.</div>
+          <!-- Figma Link Button Added -->
+          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border2); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Design Source</span>
+            <a href="https://www.figma.com" target="_blank" style="font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); text-decoration: none; border: 1px solid var(--border); padding: 5px 14px; border-radius: 20px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)';" onmouseout="this.style.background='transparent'; this.style.color='var(--gold)';">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/></svg>
+              View Figma File
+            </a>
+          </div>
+        </div>
+
+        <!-- PROJECT CARD 2: HEALTHCARE CLINICAL APP -->
+        <div class="proj-card" id="proj-card-2">
+          <div class="proj-design-hub" onclick="triggerLightboxPreview(2)">
+            <div class="hub-viewport" id="viewport-2"></div>
+          </div>
+          <div class="hub-switcher">
+            <button class="hub-btn active" onclick="switchHubView(2, 'wireframe', this, event)">WIREFRAME</button>
+            <button class="hub-btn" onclick="switchHubView(2, 'flow', this, event)">USER FLOW</button>
+            <button class="hub-btn" onclick="switchHubView(2, 'ui', this, event)">FINAL UI</button>
+          </div>
+          <div class="proj-icon-row">
+            <div class="proj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+            <span class="proj-count-label">Healthcare</span>
+          </div>
+          <div class="proj-title">Healthcare clinical App</div>
+          <div class="proj-company">Orange Office Technologies</div>
+          <div class="proj-desc">MedCare is a patient-centric mobile health ecosystem designed to streamline medical consultations, records management, and remote care. The application addresses the friction in modern healthcare by offering patients an integrated platform for appointment scheduling, secure health tracking, and instant telehealth communication.</div>
+          <!-- Figma Link Button Added -->
+          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border2); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Design Source</span>
+            <a href="https://www.figma.com" target="_blank" style="font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); text-decoration: none; border: 1px solid var(--border); padding: 5px 14px; border-radius: 20px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)';" onmouseout="this.style.background='transparent'; this.style.color='var(--gold)';">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/></svg>
+              View Figma File
+            </a>
+          </div>
+        </div>
+
+        <!-- PROJECT CARD 3: MONKIFYAI -->
+         <div class="proj-card" id="proj-card-3">
+          <div class="proj-design-hub" onclick="triggerLightboxPreview(3)">
+            <div class="hub-viewport" id="viewport-3"></div>
+          </div>
+          <div class="hub-switcher">
+            <button class="hub-btn active" onclick="switchHubView(3, 'wireframe', this, event)">WIREFRAME</button>
+            <button class="hub-btn" onclick="switchHubView(3, 'flow', this, event)">USER FLOW</button>
+            <button class="hub-btn" onclick="switchHubView(3, 'ui', this, event)">FINAL UI</button>
+          </div>
+          <div class="proj-icon-row">
+            <div class="proj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+            <span class="proj-count-label">MonkifyAI</span>
+          </div>
+          <div class="proj-title">MonkifyAI</div>
+          <div class="proj-company">Orange Office Technologies</div>
+          <div class="proj-desc">Monkify AI is a next-generation recruitment and job searching application designed to accelerate the hiring process. By combining AI-driven matching algorithms with secure blockchain technology, the platform offers job seekers and recruiters unparalleled efficiency, absolute data integrity, and high-level security during user onboarding and credential verification.</div>
+          <!-- Figma Link Button Added -->
+          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border2); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Design Source</span>
+            <a href="https://www.figma.com" target="_blank" style="font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); text-decoration: none; border: 1px solid var(--border); padding: 5px 14px; border-radius: 20px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)';" onmouseout="this.style.background='transparent'; this.style.color='var(--gold)';">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/></svg>
+              View Figma File
+            </a>
+          </div>
+        </div>
+
+        <!-- PROJECT CARD 4: AURA FINTECH -->
+        <div class="proj-card" id="proj-card-4">
+          <div class="proj-design-hub" onclick="triggerLightboxPreview(4)">
+            <div class="hub-viewport" id="viewport-4"></div>
+          </div>
+          <div class="hub-switcher">
+            <button class="hub-btn active" onclick="switchHubView(4, 'wireframe', this, event)">WIREFRAME</button>
+            <button class="hub-btn" onclick="switchHubView(4, 'flow', this, event)">USER FLOW</button>
+            <button class="hub-btn" onclick="switchHubView(4, 'ui', this, event)">FINAL UI</button>
+          </div>
+          <div class="proj-icon-row">
+            <div class="proj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+            <span class="proj-count-label">Fintech Wallet</span>
+          </div>
+          <div class="proj-title">Aura</div>
+          <div class="proj-company">Orange Office Technologies</div>
+          <div class="proj-desc">Frictionless dynamic layout processing for consumer digital token checkouts, quick identity validation frameworks, and WCAG-compliant transactional histories.</div>
+          <!-- Figma Link Button Added -->
+          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border2); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Design Source</span>
+            <a href="https://www.figma.com" target="_blank" style="font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); text-decoration: none; border: 1px solid var(--border); padding: 5px 14px; border-radius: 20px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.background='var(--gold)'; this.style.color='var(--bg)';" onmouseout="this.style.background='transparent'; this.style.color='var(--gold)';">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/></svg>
+              View Figma File
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="sec-inner">
+      <div class="sec-header">
+        <span class="sec-num">04 /</span>
+        <span class="sec-title">Capabilities Matrix</span>
+        <span class="sec-line"></span>
+      </div>
+      <div class="skills-layout">
+        <div class="skill-card">
+          <div class="skill-cat-label">UX Strategy &amp; Architecture</div>
+          <div class="tags">
+            <span class="tag">Wireframing</span><span class="tag">High-Fidelity UI Design</span><span class="tag">User Flow Mapping</span>
+            <span class="tag">Heuristic Evaluation</span><span class="tag">Information Architecture</span><span class="tag">Usability Testing</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-cat-label">Design System Mechanics</div>
+          <div class="tags">
+            <span class="tag">Atomic Design Methodology</span><span class="tag">Figma Variables &amp; Tokens</span><span class="tag">Component Libraries</span>
+            <span class="tag">Reusable Pattern Systems</span><span class="tag">Design QA Validation</span><span class="tag">Dev Mode Specifications</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="achievements">
+    <div class="sec-inner">
+      <div class="sec-header">
+        <span class="sec-num">05 /</span>
+        <span class="sec-title">Performance Metrics</span>
+        <span class="sec-line"></span>
+      </div>
+      <div class="ach-grid">
+        <div class="ach-card">
+          <div class="ach-num">35<sup>%</sup></div>
+          <div class="ach-text"><strong>Reduction in UI layout flaws</strong> engineered by establishing deep variables and systematic pattern models in Figma.</div>
+        </div>
+        <div class="ach-card">
+          <div class="ach-num">20<sup>%</sup></div>
+          <div class="ach-text"><strong>Improvement in task success loops</strong> recorded across enterprise fintech digital checkout workflows.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai-matrix">
+    <div class="sec-inner">
+      <div class="sec-header">
+        <span class="sec-num">06 /</span>
+        <span class="sec-title">AI Co-Creation Workflows</span>
+        <span class="sec-line"></span>
+      </div>
+      <p class="proj-hint" style="text-align: left; margin-bottom: 16px;">How I engineer systemic product design with 2026 AI execution engines</p>
+      
+      <div class="ai-workflow-grid">
+        <div class="ai-card">
+          <div class="ai-badge">Claude Artifacts</div>
+          <h4 class="ai-title">Prompt-Driven Prototyping</h4>
+          <p class="ai-desc">Utilizing Claude LLM prompt layers to generate instant functional HTML/JS evaluation interfaces. Accelerates stakeholder requirements gather cycles by 50% through direct live system interactions before Figma layout mapping begins.</p>
+        </div>
+
+        <div class="ai-card">
+          <div class="ai-badge">Automated QA</div>
+          <h4 class="ai-title">AI-Assisted Accessibility Audits</h4>
+          <p class="ai-desc">Deploying vision LLM engines to execute rapid UX analysis passes across product states. Instantly cross-checks color contrast matrices, element structures, and visual consistency against precise WCAG 2.1 compliance laws.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+  <div class="sec-inner">
+    <div class="sec-header">
+      <span class="sec-num">07 /</span>
+      <span class="sec-title">Secure Connection</span>
+      <span class="sec-line"></span>
+    </div>
+    <div class="contact-wrap">
+      <div>
+        <div class="contact-tagline">Let's blueprint the next <em>disruptive product</em> ecosystem.</div>
+        <div class="contact-sub">Available for senior product strategy alignment roles, advanced design systems architecture operations, and high-fidelity product consulting frameworks.</div>
+      </div>
+      <div class="contact-items">
+        
+        <div class="contact-row">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.44 10a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.55 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-val">
+              <a href="tel:+919952129182" style="text-decoration: none; color: inherit;">+91 9952129182</a>
+            </div>
+            <div class="contact-key">
+              <a href="https://wa.me/919952129182" target="_blank" style="color: #25D366; text-decoration: underline; font-weight: 500;">
+                Chat on WhatsApp
+              </a> 
+              / Call
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-val">
+              <a href="mailto:dineshkarthivel@gmail.com" style="text-decoration: none; color: inherit;">dineshkarthivel@gmail.com</a>
+            </div>
+            <div class="contact-key">Direct Inbox</div>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              <path d="M2 12h20"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-val">Chennai, Tamil Nadu, India</div>
+            <div class="contact-key">Primary Location Node</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+  <footer style="text-align: center; padding: 40px 20px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border2);">
+    <span>Dinesh Kumar</span> &nbsp;·&nbsp; Senior UI/UX Engineer &nbsp;·&nbsp; 2026
+  </footer>
+</div>
+
+<script>
+  // ── RE-ENGINEERED DYNAMIC FULL-SCREEN LOVE PREVIEW ENGINE ──
+  const canvas = document.getElementById('sparkle-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animationFrameId;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  const sparkleColors = ['#FFD700', '#FF69B4', '#BF94E4', '#00FFFF', '#E8C97A', '#FF4B91'];
+
+  class HeartParticle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.height = canvas.height;
+      this.y = Math.random() * canvas.height;
+      
+      this.vx = (Math.random() - 0.5) * 2.5;
+      this.vy = (Math.random() - 0.7) * 3 - 0.5; 
+      this.size = Math.random() * 2.5 + 2.5; 
+      
+      this.color = sparkleColors[Math.floor(Math.random() * sparkleColors.length)];
+      this.alpha = 1;
+      this.decay = Math.random() * 0.006 + 0.005; 
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.alpha -= this.decay;
+    }
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.beginPath();
+      
+      let x = this.x;
+      let y = this.y;
+      let s = this.size;
+      
+      ctx.moveTo(x, y + s / 4);
+      ctx.bezierCurveTo(x, y - s / 2, x - s, y - s / 2, x - s, y + s / 4);
+      ctx.bezierCurveTo(x - s, y + (s * 0.6), x - s / 2, y + s, x, y + s * 1.3);
+      ctx.bezierCurveTo(x + s / 2, y + s, x + s, y + s * 0.6, x + s, y + s / 4);
+      ctx.bezierCurveTo(x + s, y - s / 2, x, y - s / 2, x, y + s / 4);
+      
+      ctx.closePath();
+      ctx.fillStyle = this.color;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = this.color;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function spawnFullScreenLoveSparkles() {
+    for (let i = 0; i < 150; i++) {
+      particles.push(new HeartParticle());
+    }
+    runSparkleLoop();
+  }
+
+  function runSparkleLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => p.alpha > 0);
+    
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+
+    if (particles.length > 0) {
+      animationFrameId = requestAnimationFrame(runSparkleLoop);
+    } else {
+      cancelAnimationFrame(animationFrameId);
+    }
+  }
+
+  // ── SLIDE TO UNLOCK SWIPE ENGINE TRACKS ──
+  const handle = document.getElementById('swipe-handle');
+  const track = document.getElementById('swipe-track');
+  let isDragging = false;
+  let startX = 0;
+  
+  function getMaxSlide() { return track.clientWidth - handle.clientWidth - 6; }
+
+  function startSwipe(e) {
+    isDragging = true;
+    startX = e.clientX || (e.touches && e.touches[0].clientX);
+    handle.style.transition = 'none';
+  }
+
+  function moveSwipe(e) {
+    if (!isDragging) return;
+    const currentX = e.clientX || (e.touches && e.touches[0].clientX);
+    let deltaX = currentX - startX;
+    const maxSlide = getMaxSlide();
+
+    if (deltaX < 0) deltaX = 0;
+    if (deltaX > maxSlide) deltaX = maxSlide;
+
+    handle.style.transform = `translateX(${deltaX}px)`;
+
+    if (deltaX >= maxSlide - 2) {
+      isDragging = false;
+      executeCinematicGlowUnlock();
+    }
+  }
+
+  function endSwipe() {
+    if (!isDragging) return;
+    isDragging = false;
+    handle.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    handle.style.transform = 'translateX(0px)';
+  }
+
+  handle.addEventListener('mousedown', startSwipe);
+  window.addEventListener('mousemove', moveSwipe);
+  window.addEventListener('mouseup', endSwipe);
+
+  handle.addEventListener('touchstart', startSwipe);
+  window.addEventListener('touchmove', moveSwipe);
+  window.addEventListener('touchend', endSwipe);
+
+  // ── CINEMATIC UNLOCK FLOW ──
+  function executeCinematicGlowUnlock() {
+    const flash = document.getElementById('unlock-glow-flash');
+    const gate = document.getElementById('login-gate');
+    const wrapper = document.getElementById('main-portfolio-wrapper');
+
+    spawnFullScreenLoveSparkles();
+
+    flash.style.display = 'block';
+    setTimeout(() => {
+      flash.style.opacity = '1';
+    }, 10);
+
+    setTimeout(() => {
+      gate.style.opacity = '0';
+      gate.style.transform = 'scale(1.03) translateY(-8px)';
+      wrapper.style.opacity = '1';
+      wrapper.style.transform = 'scale(1)';
+
+      setTimeout(() => {
+        flash.style.opacity = '0';
+        
+        setTimeout(() => {
+          gate.style.display = 'none';
+          flash.style.display = 'none';
+          
+          animateCount(document.getElementById('stat-0'), 6, '+');
+          animateCount(document.getElementById('stat-1'), 35, '%');
+          animateCount(document.getElementById('stat-2'), 20, '%');
+          animateCount(document.getElementById('stat-3'), 40, '%');
+        }, 1500);
+      }, 300);
+    }, 250);
+  }
+
+  // SCROLLED NAVBAR
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // COUNTER ENGINE
+  function animateCount(el, target, suffix) {
+    let start = 0;
+    const step = Math.ceil(target / 25);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { start = target; clearInterval(timer); }
+      el.innerHTML = start + '<sup>' + suffix + '</sup>';
+    }, 40);
+  }
+
+  window.addEventListener('load', () => {
+    for(let i=1; i<=4; i++) {
+        switchHubView(i, 'wireframe', document.querySelector(`#proj-card-${i} .hub-btn`));
+    }
+  });
+
+  // COMPONENT DATA MAPS WITH LOCAL IMAGE CHANNELS
+  const mockUIRepository = {
+    1: {
+      'wireframe': `<img src="https://github.com/user-attachments/assets/3db57d4c-95d5-478f-86b8-1deba64e60c9" alt="Loyaltri Wireframe View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`,
+      'flow': `<img src="https://github.com/user-attachments/assets/4b3f21bd-62fd-4dbe-8b99-ee806210b643" alt="Loyaltri User Flow View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`,
+      'ui': `<img src="https://github.com/user-attachments/assets/5cc50964-e51b-42ca-b6b6-b250300db77d" alt="Loyaltri Final UI View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`
+    },
+    2: {
+      'wireframe': `<img src="https://github.com/user-attachments/assets/e695415a-e6e0-4acd-925a-d46f38450016" alt="Healthcare Wireframe View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`,
+      'flow': `<img src="https://github.com/user-attachments/assets/7dcf450d-42d3-449f-8dfb-e777911b6ec8" alt="Healthcare User Flow View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`,
+      'ui': `<img src="https://github.com/user-attachments/assets/c003344b-4d6b-4293-8775-f29272c55d01" alt="Healthcare Final UI View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`
+    },
+    3: {
+      'wireframe': `<img src="https://github.com/user-attachments/assets/257b7c00-4b32-4d84-babc-b07b3c0510bf" alt="Monkify Wireframe View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`,
+      'flow': `<img src="https://github.com/user-attachments/assets/28c3cabe-ab30-4d53-b42a-3b83b404f4f3" alt="Monkify User Flow View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`,
+      'ui': `<img src="https://github.com/user-attachments/assets/c18402a9-125f-48f9-8f63-e039c9442ed8" alt="Monkify Final UI View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`
+    },
+    4: {
+      'wireframe': `<img src="https://github.com/user-attachments/assets/9d707417-9fe1-4b9b-bc90-9a4493ecb975" alt="Fintech Wireframe View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`,
+      'flow': `<img src="https://github.com/user-attachments/assets/ae7a3553-bf14-4357-b362-b1ece2d983c4" alt="Fintech User Flow View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`,
+      'ui': `<img src="https://github.com/user-attachments/assets/a21ae331-caac-4d78-a6b4-5dd11d033d25" alt="Fintech Final UI View" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`
+    }
+  };
+
+  function switchHubView(projId, type, btnEl, event) {
+    if (event) event.stopPropagation();
+    const viewport = document.getElementById('viewport-' + projId);
+    const card = document.getElementById('proj-card-' + projId);
+    
+    viewport.style.opacity = '0';
+    viewport.style.transform = 'scale(0.98)';
+
+    setTimeout(() => {
+      viewport.innerHTML = mockUIRepository[projId][type];
+      const switcher = card.querySelector('.hub-switcher');
+      switcher.querySelectorAll('.hub-btn').forEach(btn => btn.classList.remove('active'));
+      btnEl.classList.add('active');
+      viewport.style.opacity = '1';
+      viewport.style.transform = 'scale(1)';
+    }, 120);
+  }
+
+  // DYNAMIC LIGHTBOX MANAGER
+  const modal = document.getElementById('preview-modal');
+  const modalContentBox = document.getElementById('modal-content-box');
+  const modalTarget = document.getElementById('modal-viewport-target');
+  const closeBtn = document.getElementById('modal-close-btn');
+
+  function triggerLightboxPreview(projId) {
+    const sourceViewport = document.getElementById('viewport-' + projId);
+    modalTarget.innerHTML = sourceViewport.innerHTML;
+    
+    const innerFrame = modalTarget.querySelector('.ui-mock-frame');
+    if (innerFrame) {
+        innerFrame.style.fontSize = '14px';
+        innerFrame.style.padding = '24px';
+        if (innerFrame.style.maxWidth) innerFrame.style.maxWidth = '250px';
+    }
+
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.style.opacity = '1';
+      modalContentBox.style.transform = 'scale(1)';
+    }, 15);
+  }
+
+  function dismissLightboxModal() {
+    modal.style.opacity = '0';
+    modalContentBox.style.transform = 'scale(0.92)';
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modalTarget.innerHTML = '';
+    }, 350);
+  }
+
+  closeBtn.addEventListener('click', dismissLightboxModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) dismissLightboxModal();
+  });
+</script>
+</body>
+</html>
