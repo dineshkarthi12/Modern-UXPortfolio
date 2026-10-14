@@ -387,7 +387,7 @@ window.SITE = {
     "Google UX Design Professional Certificate",
     "Figma Advanced UI Design",
     "Design Patterns (UI/UX)",
-    "HTML, CSS & JavaScript for Web Developers (Coursera / Johns Hopkins University)"
+    "HTML, CSS & JavaScript for Web Developers (Coursera)"
   ],
 
   education: {
