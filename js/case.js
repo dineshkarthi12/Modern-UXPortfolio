@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const { S, esc, rich, pad2, icons, motion } = DK;
+  const { S, esc, rich, stripTodo, pad2, icons, motion } = DK;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
@@ -13,7 +13,8 @@
   const next = S.projects[(index + 1) % S.projects.length];
   const total = S.projects.length;
 
-  const paras = (list) => list.map((t) => `<p>${rich(t)}</p>`).join("");
+  // Skip anything that is empty once draft notes are removed.
+  const paras = (list) => list.map(stripTodo).filter(Boolean).map((t) => `<p>${esc(t)}</p>`).join("");
 
   const section = (no, id, title, inner, cls = "") => `
     <section class="cs-sec ${cls}" id="${id}" aria-labelledby="${id}-h">
@@ -32,12 +33,12 @@
     ["Timeline", cs.meta.timeline],
     ["Team", cs.meta.team],
     ["Tools", cs.meta.tools]
-  ].map(([k, v]) => `<div class="cs-meta__item"><dt class="label">${k}</dt><dd>${rich(v)}</dd></div>`).join("");
+  ].filter(([, v]) => stripTodo(v))
+    .map(([k, v]) => `<div class="cs-meta__item"><dt class="label">${k}</dt><dd>${rich(v)}</dd></div>`).join("");
 
-  const results = cs.results.map((r) => {
+  const results = cs.results.filter((r) => !r.todo && stripTodo(r.label)).map((r) => {
     let value;
-    if (r.todo) value = `<span class="cs-result__todo">${rich(r.todo)}</span>`;
-    else if (r.text) value = `<span class="cs-result__num">${esc(r.text)}</span>`;
+    if (r.text) value = `<span class="cs-result__num">${esc(r.text)}</span>`;
     else value = `<span class="cs-result__num" data-count="${r.value}" data-prefix="${esc(r.prefix || "")}" data-suffix="${esc(r.suffix || "")}">${esc(r.prefix || "")}${r.value}${esc(r.suffix || "")}</span>`;
     return `<li class="cs-result">${value}<span class="mono cs-result__label">${rich(r.label)}</span></li>`;
   }).join("");
@@ -68,16 +69,16 @@
         <div class="cs-cover__stage">
           <div class="cs-cover__img">${DK.projectImg(p, "ui", { eager: true, alt: `${p.name} final interface` })}</div>
         </div>
-        <dl class="cs-meta">${metaRow}</dl>
+        ${metaRow ? `<dl class="cs-meta">${metaRow}</dl>` : ""}
       </div>
     </section>
 
     ${section("01", "overview", "Overview", `<div class="cs-sec__body lead">${paras(cs.overview)}
       <ul class="cs-points">${p.points.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></div>`)}
 
-    ${section("02", "problem", "The problem", `<div class="cs-sec__body">${paras(cs.problem)}</div>`)}
+    ${paras(cs.problem) ? section("02", "problem", "The problem", `<div class="cs-sec__body">${paras(cs.problem)}</div>`) : ""}
 
-    ${section("03", "research", "Research & insights", `<div class="cs-sec__body">${paras(cs.research)}</div>`)}
+    ${paras(cs.research) ? section("03", "research", "Research & insights", `<div class="cs-sec__body">${paras(cs.research)}</div>`) : ""}
 
     ${section("04", "flow", "User flow", `
       <div class="cs-flow">
@@ -116,9 +117,9 @@
         <figcaption class="figcap mono"><span>Fig. ${pad2(index + 1)}.3 — Wireframe ↔ final UI</span><span>Drag, or use ← → keys</span></figcaption>
       </figure>`)}
 
-    ${section("07", "results", "Results", `<ul class="cs-results">${results}</ul>`)}
+    ${results ? section("07", "results", "Results", `<ul class="cs-results">${results}</ul>`) : ""}
 
-    ${section("08", "learned", "What I learned", `<div class="cs-sec__body lead">${paras(cs.learned)}</div>`)}
+    ${paras(cs.learned) ? section("08", "learned", "What I learned", `<div class="cs-sec__body lead">${paras(cs.learned)}</div>`) : ""}
 
     <nav class="cs-next" aria-label="More work">
       <div class="wrap">

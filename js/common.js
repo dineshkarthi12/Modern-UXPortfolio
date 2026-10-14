@@ -25,8 +25,9 @@
 
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  // Escape text, then wrap any [TODO: …] in a visible placeholder span.
-  const rich = (s) => esc(s).replace(/\[TODO:[^\]]*\]/g, (m) => `<span class="todo">${m}</span>`);
+  // Draft notes written as [TODO: …] in data.js are never shown on the site.
+  const stripTodo = (s) => String(s == null ? "" : s).replace(/\[TODO:[^\]]*\]/g, "").replace(/\s{2,}/g, " ").trim();
+  const rich = (s) => esc(stripTodo(s));
 
   const asset = (p) => (/^(https?:)?\/\//.test(p) || p.startsWith("data:") ? p : ROOT + p);
 
@@ -318,7 +319,7 @@
 
   window.DK = {
     S, ROOT, IS_HOME, motion, reduced, hasLibs,
-    esc, rich, asset, pad2, icons, ext,
+    esc, rich, stripTodo, asset, pad2, icons, ext,
     isPlaceholderFigma, placeholderSrc, imgFallback, projectImg,
     trapFocus, scrollToEl, scrollToHash, initReveals, countUp,
     lenis: null

@@ -3,8 +3,7 @@
  * Pages read window.SITE and render from it, so change copy, links and
  * numbers in this file only.
  *
- * Any text written as [TODO: …] shows up on the page as a visible
- * placeholder, so you can mark gaps while drafting.
+ * Draft notes written as [TODO: …] are never shown on the site.
  */
 window.SITE = {
   person: {
