@@ -15,7 +15,11 @@
   doc.classList.toggle("motion", motion);
   doc.classList.toggle("static", !motion);
 
-  if (hasLibs) gsap.registerPlugin(ScrollTrigger);
+  if (hasLibs) {
+    gsap.registerPlugin(ScrollTrigger);
+    // Mobile address bars resize the viewport while scrolling; don't re-measure for that.
+    ScrollTrigger.config({ ignoreMobileResize: true });
+  }
 
   /* ---------- helpers ---------- */
 
@@ -54,8 +58,8 @@
       Array.from({ length: 15 }, (_, i) => `<line x1="${(i + 1) * 100}" y1="0" x2="${(i + 1) * 100}" y2="1000"/>`).join("") +
       Array.from({ length: 9 }, (_, i) => `<line x1="0" y1="${(i + 1) * 100}" x2="1600" y2="${(i + 1) * 100}"/>`).join("") +
       `</g><g stroke="#14191D" stroke-opacity=".35" fill="none"><rect x="560" y="390" width="480" height="220"/><line x1="560" y1="390" x2="1040" y2="610"/><line x1="1040" y1="390" x2="560" y2="610"/></g>` +
-      `<text x="800" y="680" text-anchor="middle" font-family="JetBrains Mono, Menlo, monospace" font-size="30" letter-spacing="3" fill="#14191D">${t.toUpperCase()}</text>` +
-      `<text x="800" y="726" text-anchor="middle" font-family="JetBrains Mono, Menlo, monospace" font-size="22" letter-spacing="2" fill="#3F4950">IMAGE NOT AVAILABLE</text></svg>`;
+      `<text x="800" y="680" text-anchor="middle" font-family="Geist Mono, Menlo, monospace" font-size="30" letter-spacing="3" fill="#14191D">${t.toUpperCase()}</text>` +
+      `<text x="800" y="726" text-anchor="middle" font-family="Geist Mono, Menlo, monospace" font-size="22" letter-spacing="2" fill="#3F4950">IMAGE NOT AVAILABLE</text></svg>`;
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
 

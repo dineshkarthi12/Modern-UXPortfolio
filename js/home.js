@@ -8,6 +8,11 @@
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
   const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
   const KINDS = ["wireframe", "flow", "ui"];
+  // Pinned scroll scenes only make sense on wide, landscape screens. Tall
+  // viewports (portrait tablets, phones in "desktop site" mode) get the
+  // stacked layout instead, or the pin leaves a screen of empty space.
+  const PIN_QUERY = "(min-width: 900px) and (min-aspect-ratio: 5/4)";
+  const NOPIN_QUERY = "(max-width: 899px), (max-aspect-ratio: 249/200)";
   const KIND_NAMES = { wireframe: "Wireframe", flow: "User flow", ui: "Final UI" };
 
   /* ======================================================================
@@ -463,8 +468,8 @@
   }
 
   function initWork() {
-    const desktop = window.matchMedia("(min-width: 900px)").matches;
-    const GAP = desktop ? 120 : 60;
+    const pinned = window.matchMedia(PIN_QUERY).matches;
+    const GAP = window.matchMedia("(min-width: 900px)").matches ? 120 : 60;
 
     $$(".scene").forEach((scene) => {
       const stage = $(".stage", scene);
@@ -513,7 +518,7 @@
         p: 1,
         ease: "none",
         onUpdate: () => render(proxy.p),
-        scrollTrigger: desktop
+        scrollTrigger: pinned
           ? {
               trigger: scene,
               // pin the scene centred in the space below the header
@@ -587,7 +592,7 @@
     const { section, viewport, track, cards, setCurrent, setBar } = processParts();
     const mm = gsap.matchMedia();
 
-    mm.add("(min-width: 900px)", () => {
+    mm.add(PIN_QUERY, () => {
       section.classList.add("is-pinned");
       let centers = [];
       const measure = () => { centers = cards.map((c) => c.offsetLeft + c.offsetWidth / 2); };
@@ -630,7 +635,7 @@
       };
     });
 
-    mm.add("(max-width: 899px)", () => initProcessSwipe());
+    mm.add(NOPIN_QUERY, () => initProcessSwipe());
   }
 
   function initTimeline() {
