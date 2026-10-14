@@ -85,15 +85,15 @@ window.SITE = {
       figma: "https://www.figma.com/design/0npQmAvx6Nscf4k6FWUJlL",
       caseStudy: {
         meta: {
-          role: "Senior UI/UX & Product Designer, end-to-end UX",
-          platform: "Web app, B2B SaaS",
-          timeline: "Discovery to release, in Agile sprints",
-          team: "Product owner, developers and me",
-          tools: "Figma, FigJam, Dev Mode, design tokens"
+          role: "Lead Designer",
+          platform: "Web and mobile",
+          timeline: "6–7 months",
+          team: "3-person team, design led by me",
+          tools: "Figma, Adobe XD, Sketch"
         },
         overview: [
           "Loyaltri is a SaaS product from Orange Office Technologies. It runs payroll, subscription billing and loyalty programmes for more than 50 enterprise clients.",
-          "I owned the UX from start to finish: wireframes, user flows and high-fidelity prototypes for all three modules, through to developer handoff."
+          "As lead designer I owned the UX from start to finish: research, wireframes, user flows and high-fidelity prototypes for all three modules, through to developer handoff."
         ],
         problem: [
           "The hardest part was rule configuration. Tax and payroll rules come in several tiers, and HR administrators were making errors while setting them up. A wrong payroll rule is not a cosmetic bug. It ends up in someone's salary.",
@@ -146,15 +146,15 @@ window.SITE = {
       figma: "https://www.figma.com/design/AFBBvjWdp7wJBpWa7QP71s",
       caseStudy: {
         meta: {
-          role: "Senior UI/UX & Product Designer",
-          platform: "Mobile app for patients",
-          timeline: "Research to handoff, in Agile sprints",
-          team: "Product owner, developers and me",
-          tools: "Figma, FigJam, prototyping, Dev Mode"
+          role: "Lead Designer",
+          platform: "Web and mobile",
+          timeline: "3–4 months",
+          team: "3-person team, design led by me",
+          tools: "Figma, Adobe XD, Sketch"
         },
         overview: [
-          "MedCare is a mobile app for patients. Appointment booking, medical records and telehealth sit in one place.",
-          "I designed the patient flows for all three, from research to high-fidelity prototypes and developer handoff."
+          "MedCare is a patient app on web and mobile. Appointment booking, medical records and telehealth sit in one place.",
+          "As lead designer I took the patient flows for all three from research to high-fidelity prototypes and developer handoff."
         ],
         problem: [
           "Booking an appointment should not need a medical vocabulary. The clinical terms in the booking process got in the way of patients trying to see a doctor.",
@@ -206,15 +206,15 @@ window.SITE = {
       figma: "https://www.figma.com/design/Ox1ACsCYyqnWhx6mmIpwnZ",
       caseStudy: {
         meta: {
-          role: "Senior UI/UX & Product Designer",
-          platform: "Recruitment platform, web and mobile",
-          timeline: "Concept to handoff, in Agile sprints",
-          team: "Product owner, developers and me",
-          tools: "Figma, FigJam, Uizard, Dev Mode"
+          role: "Lead Designer",
+          platform: "Web and mobile",
+          timeline: "3–4 months",
+          team: "3-person team, design led by me",
+          tools: "Figma, Adobe XD, Sketch"
         },
         overview: [
           "MonkifyAI is a recruitment platform. Recruiters find candidates through AI-driven search, and candidate credentials are verified on a blockchain.",
-          "I designed the search experience and the recruiter dashboard."
+          "As lead designer I took the search experience and the recruiter dashboard from research to developer handoff."
         ],
         problem: [
           "Recruiters want deep search. But every extra filter is one more thing to keep in their head. The design had to give them depth without the clutter.",
@@ -266,14 +266,14 @@ window.SITE = {
       figma: "https://www.figma.com/design/VwyjnjVnCKGmv3S9XpOeSL",
       caseStudy: {
         meta: {
-          role: "Senior UI/UX & Product Designer",
-          platform: "Mobile app, B2C",
-          timeline: "Discovery to release, in Agile sprints",
-          team: "Product owner, developers and me",
-          tools: "Figma, prototyping, micro-interaction specs, Dev Mode"
+          role: "Lead Designer",
+          platform: "Web and mobile",
+          timeline: "3–4 months",
+          team: "3-person team, design led by me",
+          tools: "Figma, Adobe XD, Sketch"
         },
         overview: [
-          "Aura is a digital wallet for consumers. I designed its mobile-first payment flows: onboarding, KYC, transaction history and checkout."
+          "Aura is a digital wallet for consumers. As lead designer I took its mobile-first payment flows from research to developer handoff: onboarding, KYC, transaction history and checkout."
         ],
         problem: [
           "A wallet has to verify who you are. But every extra verification step is another place to give up.",
