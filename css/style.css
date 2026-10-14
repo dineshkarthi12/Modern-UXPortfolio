@@ -301,8 +301,6 @@ ul, ol { padding: 0; list-style: none; }
   display: inline-grid;
   place-items: center;
   width: 40px; height: 40px;
-  border: 1px solid currentColor;
-  border-radius: var(--radius);
   font-family: var(--f-display);
   font-size: 1.0625rem;
   font-weight: 500;
@@ -310,6 +308,10 @@ ul, ol { padding: 0; list-style: none; }
   text-decoration: none;
   line-height: 1;
 }
+
+.dk-mark { display: block; width: 100%; height: 100%; overflow: visible; }
+.dk-mark__text { font-family: var(--f-display); font-size: 17px; font-weight: 500; letter-spacing: -.02em; }
+.monogram:focus-visible { outline-offset: 5px; }
 
 .nav { margin-left: auto; }
 .nav > ul { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 36px); }
@@ -461,8 +463,6 @@ ul, ol { padding: 0; list-style: none; }
 .loader__mono {
   width: 88px; height: 88px;
   display: grid; place-items: center;
-  border: 1px solid var(--ink);
-  border-radius: var(--radius);
   font-family: var(--f-display);
   font-size: 2.25rem;
   font-weight: 500;

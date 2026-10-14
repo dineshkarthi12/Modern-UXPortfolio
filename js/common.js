@@ -37,6 +37,10 @@
 
   const ext = 'target="_blank" rel="noopener"';
 
+  // DK mark: the box morphs into a beating heart and back, on a loop (SVG/SMIL,
+  // so it runs in every browser). Paused for reduced-motion users.
+  const DK_MARK = '<svg class="dk-mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><g transform="translate(20 20)"><g><animateTransform attributeName="transform" type="scale" dur="5s" repeatCount="indefinite" calcMode="spline" values="1;1;1;1.16;1;1.09;1;1.16;1;1.09;1;1;1" keyTimes="0;0.4;0.43;0.46;0.49;0.51;0.54;0.57;0.6;0.62;0.645;0.7;1" keySplines="0 0 1 1;.3 0 .7 1;.3 0 .7 1;.3 0 .7 1;.3 0 .7 1;.3 0 .7 1;.3 0 .7 1;.3 0 .7 1;.3 0 .7 1;.3 0 .7 1;0 0 1 1;0 0 1 1"/><g transform="translate(-20 -20)"><rect x="0.5" y="0.5" width="39" height="39" rx="2" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke"><animate attributeName="opacity" dur="5s" repeatCount="indefinite" calcMode="discrete" keyTimes="0;0.3;0.76" values="1;0;1"/></rect><path class="dk-mark__shape" d="M20,39.5 C0.5,39.5 0.5,39.5 0.5,20 C0.5,0.5 0.5,0.5 10,0.5 C15,0.5 18,0.5 20,0.5 C22,0.5 25,0.5 30,0.5 C39.5,0.5 39.5,0.5 39.5,20 C39.5,39.5 39.5,39.5 20,39.5 Z" fill="#E5484D" fill-opacity="0" stroke-opacity="0" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke"><animate attributeName="d" dur="5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.3;0.4;0.66;0.76;1" keySplines="0 0 1 1;.45 0 .2 1;0 0 1 1;.45 0 .2 1;0 0 1 1" values="M20,39.5 C0.5,39.5 0.5,39.5 0.5,20 C0.5,0.5 0.5,0.5 10,0.5 C15,0.5 18,0.5 20,0.5 C22,0.5 25,0.5 30,0.5 C39.5,0.5 39.5,0.5 39.5,20 C39.5,39.5 39.5,39.5 20,39.5 Z;M20,39.5 C0.5,39.5 0.5,39.5 0.5,20 C0.5,0.5 0.5,0.5 10,0.5 C15,0.5 18,0.5 20,0.5 C22,0.5 25,0.5 30,0.5 C39.5,0.5 39.5,0.5 39.5,20 C39.5,39.5 39.5,39.5 20,39.5 Z;M20,35 C8,27 3,20 3,13 C3,7 7,4 11.5,4 C15,4 18,6 20,9 C22,6 25,4 28.5,4 C33,4 37,7 37,13 C37,20 32,27 20,35 Z;M20,35 C8,27 3,20 3,13 C3,7 7,4 11.5,4 C15,4 18,6 20,9 C22,6 25,4 28.5,4 C33,4 37,7 37,13 C37,20 32,27 20,35 Z;M20,39.5 C0.5,39.5 0.5,39.5 0.5,20 C0.5,0.5 0.5,0.5 10,0.5 C15,0.5 18,0.5 20,0.5 C22,0.5 25,0.5 30,0.5 C39.5,0.5 39.5,0.5 39.5,20 C39.5,39.5 39.5,39.5 20,39.5 Z;M20,39.5 C0.5,39.5 0.5,39.5 0.5,20 C0.5,0.5 0.5,0.5 10,0.5 C15,0.5 18,0.5 20,0.5 C22,0.5 25,0.5 30,0.5 C39.5,0.5 39.5,0.5 39.5,20 C39.5,39.5 39.5,39.5 20,39.5 Z"/><animate attributeName="fill-opacity" dur="5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.3;0.4;0.66;0.76;1" keySplines="0 0 1 1;.45 0 .2 1;0 0 1 1;.45 0 .2 1;0 0 1 1" values="0;0;1;1;0;0"/><animate attributeName="stroke-opacity" dur="5s" repeatCount="indefinite" keyTimes="0;0.3;0.301;0.4;0.66;0.759;0.76;1" values="0;0;1;0;0;1;0;0"/></path><text class="dk-mark__text" x="20" y="20.5" text-anchor="middle" dominant-baseline="central" fill="currentColor">DK<animate attributeName="opacity" dur="5s" repeatCount="indefinite" keyTimes="0;0.3;0.36;0.7;0.76;1" values="1;1;0;0;1;1"/></text></g></g></g></svg>';
+
   const icons = {
     arrow: '<svg class="icon arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5"/></svg>',
     arrowUpRight: '<svg class="contact__arrow" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true"><path d="M8 20 20 8M10 8h10v10"/></svg>',
@@ -109,7 +113,7 @@
       <div class="page-progress" aria-hidden="true"><span></span></div>
       <header class="site-header" data-state="${IS_HOME ? "over" : "solid"}">
         <div class="wrap site-header__inner">
-          <a class="monogram" href="#top" aria-label="Dinesh Kumar, back to top">DK</a>
+          <a class="monogram" href="#top" aria-label="Dinesh Kumar, back to top">${DK_MARK}</a>
           <nav class="nav" aria-label="Primary">
             <ul>
               <li><a href="${navHref("#work")}">Work</a></li>
@@ -130,7 +134,7 @@
       </header>
       <div class="mobile-menu on-dark" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Site menu" hidden>
         <div class="mobile-menu__top">
-          <a class="monogram" href="#top" aria-label="Dinesh Kumar, back to top">DK</a>
+          <a class="monogram" href="#top" aria-label="Dinesh Kumar, back to top">${DK_MARK}</a>
           <button class="mobile-menu__close" type="button">Close ${icons.close}</button>
         </div>
         <ul class="mobile-menu__list">
@@ -327,6 +331,12 @@
 
   renderHeader();
   initScroll();
+  // Hold the DK mark still (as the box) for reduced-motion users.
+  if (reduced) {
+    document.querySelectorAll("svg.dk-mark").forEach((svg) => {
+      if (svg.pauseAnimations) { svg.setCurrentTime(0); svg.pauseAnimations(); }
+    });
+  }
   // Footer goes after <main>, so render it once the page script has filled main.
   DK.renderFooter = renderFooter;
 })();
