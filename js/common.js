@@ -212,6 +212,10 @@
     f.innerHTML = `
       <div class="wrap">
         <dl class="titleblock">
+          <span class="titleblock__draw" aria-hidden="true">
+            <i class="tb tb--top"></i><i class="tb tb--right"></i><i class="tb tb--bottom"></i><i class="tb tb--left"></i>
+            <i class="tb tb--v tb--v1"></i><i class="tb tb--v tb--v2"></i><i class="tb tb--v tb--v3"></i>
+          </span>
           <div class="titleblock__cell"><dt class="label">Drawn by</dt><dd>${esc(S.person.name)}</dd></div>
           <div class="titleblock__cell"><dt class="label">Discipline</dt><dd>UI/UX &amp; Product Design</dd></div>
           <div class="titleblock__cell"><dt class="label">Location</dt><dd>${esc(S.person.location)}</dd></div>
@@ -230,6 +234,105 @@
         </div>
       </div>`;
     body.append(f);
+    initTitleblockDraw(f.querySelector(".titleblock"));
+    // Page scripts call renderFooter last, so every button now exists.
+    initMagnetic();
+  }
+
+  // Title block lines draw themselves (like a pencil on a drawing sheet) when
+  // the footer scrolls into view; the cell text follows.
+  function initTitleblockDraw(tb) {
+    if (!motion) return;
+    tb.classList.add("is-drawable");
+    ScrollTrigger.create({ trigger: tb, start: "top 92%", once: true, onEnter: () => tb.classList.add("is-drawn") });
+  }
+
+  /* ---------- magnetic buttons ---------- */
+
+  // Buttons drift a few pixels toward the pointer and spring back on leave.
+  // Mouse and trackpad only; never on touch or with reduced motion.
+  function initMagnetic() {
+    if (!motion || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    document.querySelectorAll(".btn:not([data-magnetic])").forEach((el) => {
+      el.dataset.magnetic = "";
+      const xTo = gsap.quickTo(el, "x", { duration: 0.4, ease: "power3.out" });
+      const yTo = gsap.quickTo(el, "y", { duration: 0.4, ease: "power3.out" });
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect();
+        const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+        const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+        xTo(dx * 8);
+        yTo(dy * 5);
+      });
+      el.addEventListener("pointerleave", () => {
+        gsap.to(el, { x: 0, y: 0, duration: 0.9, ease: "elastic.out(1, 0.45)", overwrite: true });
+      });
+    });
+  }
+
+  /* ---------- page transition ---------- */
+
+  // Moving between pages: a slate panel slides up like a concrete wall, the next
+  // page loads behind it, then the panel slides away. The label travels with it
+  // through sessionStorage so both halves read the same.
+  const PT_KEY = "dk-pt";
+  function initPageTransition() {
+    const clear = () => { try { sessionStorage.removeItem(PT_KEY); } catch (_) {} };
+    if (reduced) { clear(); doc.classList.remove("pt-in"); return; }
+
+    const el = document.createElement("div");
+    el.className = "pt";
+    el.setAttribute("aria-hidden", "true");
+    el.innerHTML = '<span class="mono pt__kicker"></span><span class="pt__title"></span>';
+    body.append(el);
+    const label = (k, t) => {
+      el.querySelector(".pt__kicker").textContent = k;
+      el.querySelector(".pt__title").textContent = t;
+    };
+    const reset = () => { el.className = "pt"; };
+
+    // Arriving: the panel is already covering the page; slide it away.
+    let incoming = null;
+    try { incoming = JSON.parse(sessionStorage.getItem(PT_KEY) || "null"); } catch (_) {}
+    clear();
+    if (incoming) {
+      label(incoming.k, incoming.t);
+      el.className = "pt is-on is-up";
+      doc.classList.remove("pt-in");
+      void el.offsetWidth;
+      requestAnimationFrame(() => {
+        el.classList.add("is-anim", "is-out");
+        setTimeout(reset, 900);
+      });
+    }
+    doc.classList.remove("pt-in");
+
+    // Leaving: intercept same-site links to another page.
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("a[href]");
+      if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if ((a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      let url;
+      try { url = new URL(a.href, location.href); } catch (_) { return; }
+      if (url.origin !== location.origin || !/^https?:$/.test(url.protocol)) return;
+      if (url.pathname === location.pathname) return; // same page: in-page scroll handles it
+      e.preventDefault();
+
+      const m = url.pathname.match(/case-studies\/([a-z0-9-]+)\.html$/);
+      const i = m ? S.projects.findIndex((p) => p.slug === m[1]) : -1;
+      const k = i >= 0 ? `Case study ${pad2(i + 1)} / ${pad2(S.projects.length)}` : "Portfolio";
+      const t = i >= 0 ? S.projects[i].name : S.person.name;
+      label(k, t);
+      try { sessionStorage.setItem(PT_KEY, JSON.stringify({ k, t })); } catch (_) {}
+
+      el.className = "pt is-on";
+      void el.offsetWidth;
+      el.classList.add("is-anim", "is-up");
+      setTimeout(() => { location.href = url.href; }, 720);
+    });
+
+    // Back/forward cache: never come back to a covered page.
+    window.addEventListener("pageshow", (e) => { if (e.persisted) { reset(); doc.classList.remove("pt-in"); } });
   }
 
   /* ---------- smooth scroll ---------- */
@@ -331,6 +434,7 @@
 
   renderHeader();
   initScroll();
+  initPageTransition();
   // Hold the DK mark still (as the box) for reduced-motion users.
   if (reduced) {
     document.querySelectorAll("svg.dk-mark").forEach((svg) => {

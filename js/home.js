@@ -138,6 +138,7 @@
           <span class="mono contact__kind">${kind}</span>
           <span class="contact__value">${value}${external ? sr : ""}</span>
           ${icons.arrowUpRight}
+          <span class="contact__sweep" aria-hidden="true"></span>
         </a>${extra}
       </li>`;
     $(".contact__rows").innerHTML = [
@@ -153,6 +154,23 @@
   /* ======================================================================
      Interactions that work with or without motion
      ====================================================================== */
+
+  // Live local time in Chennai, so people in other time zones know when I'm around.
+  function initClock() {
+    const out = $(".contact__time");
+    if (!out) return;
+    let fmt;
+    try {
+      fmt = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true });
+    } catch (_) { return; }
+    const tick = () => {
+      const now = new Date();
+      out.textContent = fmt.format(now);
+      out.setAttribute("datetime", now.toISOString());
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
 
   function initCopy() {
     $$("[data-copy]").forEach((btn) => {
@@ -670,6 +688,7 @@
   DK.renderFooter();
 
   initCopy();
+  initClock();
   initLightbox();
   initHeaderState();
 
