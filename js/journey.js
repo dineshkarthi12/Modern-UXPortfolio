@@ -396,7 +396,7 @@ function buildHoardings() {
     const frame = new THREE.Mesh(new THREE.BoxGeometry(13, 7.8, 0.5), postMat);
     frame.position.y = 9.6;
     const board = new THREE.Mesh(new THREE.PlaneGeometry(12.4, 7.25), new THREE.MeshBasicMaterial({ map: hoardingTexture(s.project, s.index), toneMapped: false }));
-    board.position.set(0, 9.6, 0.26);
+    board.position.set(0, 9.6, 0.34);
     board.userData.href = `case-studies/${s.project.slug}.html`;
     clickables.push(board);
     g.add(frame, board);
