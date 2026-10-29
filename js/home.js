@@ -280,23 +280,18 @@
   }
 
   /* ======================================================================
-     Hero — the leap
+     Hero — over the 3D world
      ====================================================================== */
-
-  const ALT_TOP = 312;     // metres on the rooftop
-  const ALT_LEAP = 268;    // metres when the hero hands over to the fall
 
   function initHero() {
     const hero = $(".hero");
-    const poster = $(".hero__poster");
-    const altLabel = $(".hero__frame");
     const heroBar = $(".hero__progress span");
     const loader = $(".loader");
     const pctEl = $(".loader__pct");
     const loaderBar = $(".loader__bar span");
+    const pointsLabel = $(".hero__frame");
     const mobile = window.matchMedia("(max-width: 767px)").matches;
 
-    const state = { alt: ALT_TOP };
     const counters = $$(".hero__stat-num");
     const count = { v: 0 };
     const b1 = $('[data-block="1"]'), b2 = $('[data-block="2"]'), b3 = $('[data-block="3"]'), b4 = $('[data-block="4"]');
@@ -322,14 +317,6 @@
       }
     });
 
-    // the camera follows the dive, then the rooftop falls away to the facade behind
-    tl.fromTo(poster, { scale: 1, yPercent: 0 }, { scale: 1.3, yPercent: 7, duration: 0.82, ease: "power1.in" }, 0);
-    tl.to(poster, { autoAlpha: 0, duration: 0.1, ease: "power1.inOut" }, 0.78);
-    tl.to(state, {
-      alt: ALT_LEAP, duration: 1,
-      onUpdate: () => { altLabel.textContent = `ALT ${Math.round(state.alt)} m`; }
-    }, 0);
-
     // 0–15%: name
     tl.to(b1, { opacity: 0, y: -48, duration: 0.05, ease: "power1.in" }, 0.15);
     // 30–45%: stats
@@ -341,6 +328,7 @@
     tl.to(b3, { opacity: 0, y: -40, duration: 0.04, ease: "power1.in" }, 0.76);
     // 90–100%: calls to action
     tl.fromTo(b4, { opacity: 0, y: 48 }, { opacity: 1, y: 0, duration: 0.04, ease: "power1.out" }, 0.87);
+    tl.to({}, { duration: 1 }, 0);
 
     // If a keyboard user tabs into the final buttons early, jump to them.
     b4.addEventListener("focusin", () => {
@@ -351,25 +339,22 @@
       }
     });
 
-    /* --- loader: wait for the three scenes, then reveal --- */
+    /* --- loader: wait for the point cloud, then reveal --- */
     DK.lenis && DK.lenis.stop();
-    const scenes = [poster, $(".descent__img"), $(".landing__img")];
-    let n = 0;
-    const loaded = (img) => new Promise((resolve) => {
-      img.loading = "eager";
-      const done = () => {
-        n++;
-        pctEl.textContent = Math.round((n / scenes.length) * 100) + "%";
-        loaderBar.style.transform = `scaleX(${n / scenes.length})`;
-        resolve();
-      };
-      if (img.complete && img.naturalWidth) return done();
-      img.addEventListener("load", done, { once: true });
-      img.addEventListener("error", done, { once: true });
-    });
+    let pct = 0;
+    const tick = setInterval(() => {
+      pct = Math.min(92, pct + (100 - pct) * 0.08);
+      pctEl.textContent = Math.round(pct) + "%";
+      loaderBar.style.transform = `scaleX(${pct / 100})`;
+    }, 80);
     const timeout = new Promise((r) => setTimeout(r, 9000));
 
-    Promise.race([Promise.all(scenes.map(loaded)), timeout]).then(() => {
+    Promise.race([DK.world.ready, timeout]).then(() => {
+      clearInterval(tick);
+      pctEl.textContent = "100%";
+      loaderBar.style.transform = "scaleX(1)";
+      const n = DK.world.count ? DK.world.count() : 0;
+      if (n) pointsLabel.textContent = `${n.toLocaleString("en-IN")} points`;
       loader.classList.add("is-done");
       document.documentElement.classList.add("loaded");
       DK.lenis && DK.lenis.start();
@@ -377,69 +362,45 @@
       DK.scrollToHash && DK.scrollToHash();
 
       gsap.from($$(".hero__label, .hero__name, .hero__line", b1), {
-        y: 36, autoAlpha: 0, duration: 1.2, ease: "power3.out", stagger: 0.12, delay: 0.15
+        y: 36, autoAlpha: 0, duration: 1.2, ease: "power3.out", stagger: 0.12, delay: 0.6
       });
     });
   }
 
   /* ======================================================================
-     The fall — seen between floors — and the landing at contact
+     The camera's flight through the world, tied to the page
      ====================================================================== */
 
-  function initDescent() {
-    const root = document.documentElement;
-    const img = $(".descent__img");
-    const alt = $(".descent__alt b");
-    const contact = $("#contact");
-    const state = { alt: ALT_LEAP };
+  function initWorld() {
+    const W = DK.world;
+    if (!W || !W.setProgress) return;
 
-    // the facade streams upward and the altitude runs out between the hero and the ground
-    gsap.timeline({
-      defaults: { ease: "none" },
-      scrollTrigger: {
-        trigger: "#about",
-        start: "top bottom",
-        endTrigger: contact,
-        end: "top top",
-        scrub: 0.6
-      }
-    })
-      .fromTo(img, { yPercent: 0, rotation: -1.5 }, { yPercent: -23, rotation: 1.5, duration: 1 }, 0)
-      .to(state, { alt: 0, duration: 1, onUpdate: () => { alt.textContent = Math.round(state.alt); } }, 0);
+    // keyframe stops: start, hero end, then the top of each chapter, then the bottom of the page
+    const marks = ["#about", "#work", "#process", "#experience", "#contact"];
+    const top = (el) => el.getBoundingClientRect().top + window.scrollY;
+    const computeStops = () => {
+      const max = ScrollTrigger.maxScroll(window) || 1;
+      const stops = [0, ...marks.map((m) => Math.min(1, Math.max(0, (top($(m)) - window.innerHeight) / max))), 1];
+      for (let i = 1; i < stops.length; i++) stops[i] = Math.max(stops[i], stops[i - 1] + 0.001);
+      W.setStops(stops);
+    };
+    ScrollTrigger.addEventListener("refresh", computeStops);
 
-    // wind: streaks speed up with the scroll and settle when it stops
-    let target = 0, speed = 0, fall = 0;
     ScrollTrigger.create({
       start: 0,
       end: "max",
-      onUpdate: (self) => { target = Math.min(1, Math.abs(self.getVelocity()) / 2600); }
-    });
-    gsap.ticker.add(() => {
-      target *= 0.92;
-      speed += (target - speed) * 0.12;
-      fall += 4 + speed * 60;
-      root.style.setProperty("--speed", speed.toFixed(3));
-      root.style.setProperty("--fall", (-fall % 340).toFixed(1) + "px");
+      onUpdate: (self) => {
+        W.setProgress(self.progress);
+        W.gust(Math.min(1, Math.abs(self.getVelocity()) / 4000));
+      }
     });
 
-    // floor numbers rise into view as each storey goes past
-    $$(".floor__label").forEach((label) => {
-      gsap.fromTo(label, { yPercent: 80, autoAlpha: 0 }, {
-        yPercent: 0, autoAlpha: 1, ease: "none",
-        scrollTrigger: { trigger: label.parentElement, start: "top 80%", end: "center 50%", scrub: 0.6 }
+    // chapter labels slide up as each gap opens
+    $$(".chapter__label").forEach((label) => {
+      gsap.fromTo(label, { y: 40, autoAlpha: 0 }, {
+        y: 0, autoAlpha: 1, ease: "none",
+        scrollTrigger: { trigger: label.parentElement, start: "top 85%", end: "center 55%", scrub: 0.6 }
       });
-    });
-
-    // landing: the street rushes up, then impact
-    gsap.fromTo(".landing__img", { scale: 1.35, yPercent: -10 }, {
-      scale: 1, yPercent: 0, ease: "power2.in",
-      scrollTrigger: { trigger: contact, start: "top bottom", end: "top 30%", scrub: 0.5 }
-    });
-    ScrollTrigger.create({
-      trigger: contact,
-      start: "top 30%",
-      onEnter: () => contact.classList.add("is-landed"),
-      onLeaveBack: () => contact.classList.remove("is-landed")
     });
   }
 
@@ -666,7 +627,7 @@
 
   if (motion) {
     initHero();
-    initDescent();
+    initWorld();
     initAbout();
     initWork();
     initProcess();

@@ -33,15 +33,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
-  <link rel="preload" as="image" href="assets/scenes/leap.jpg">
-  <link rel="stylesheet" href="css/style.css?v=20261029a">
+  <link rel="preload" as="image" href="assets/hero-poster.webp">
+  <link rel="stylesheet" href="css/style.css?v=20261029b">
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
-  <script defer src="js/data.js?v=20261029a"></script>
-  <script defer src="js/common.js?v=20261029a"></script>
-  <script defer src="js/home.js?v=20261029a"></script>
+  <script defer src="js/data.js?v=20261029b"></script>
+  <script defer src="js/common.js?v=20261029b"></script>
+  <script defer src="js/world.js?v=20261029b"></script>
+  <script defer src="js/home.js?v=20261029b"></script>
 </head>
 <body data-page="home" data-root="">
 
@@ -56,18 +57,13 @@
 
   <main id="main">
 
-    <!-- The descent: a fixed falling scene, seen between the floors -->
-    <div class="descent" aria-hidden="true">
-      <img class="descent__img" src="assets/scenes/fall.jpg" alt="" width="1680" height="944" loading="lazy" decoding="async">
-      <div class="descent__speed"></div>
-      <p class="descent__alt mono">ALT <b>312</b> m</p>
-    </div>
+    <!-- The world: the hero photograph as a 3D point cloud, behind every section -->
+    <canvas class="world" aria-hidden="true" data-color="assets/hero-poster.webp" data-depth="assets/house/depth.png" data-back="assets/house/back.webp"></canvas>
 
-    <!-- A. Hero: the leap -->
+    <!-- A. Hero -->
     <section class="hero" id="top" aria-label="Introduction">
       <div class="hero__stage">
-        <img class="hero__poster" src="assets/scenes/leap.jpg" alt="A man in a black suit leaps off the edge of a glass skyscraper at sunset, the city far below." width="1680" height="944" fetchpriority="high">
-        <div class="hero__speed" aria-hidden="true"></div>
+        <img class="hero__poster" src="assets/hero-poster.webp" alt="A board-formed concrete house with floor-to-ceiling glass beside a still reflecting pool, snow mountains behind it." width="1920" height="1080" fetchpriority="high">
         <div class="hero__shade hero__shade--top" aria-hidden="true"></div>
         <div class="hero__shade hero__shade--bottom" aria-hidden="true"></div>
 
@@ -81,7 +77,7 @@
 
         <div class="hero__caption mono" aria-hidden="true">
           <span data-bind="person.coords"></span>
-          <span class="hero__frame">ALT 312 m</span>
+          <span class="hero__frame">Point cloud</span>
         </div>
         <div class="hero__scroll mono" aria-hidden="true"><span>Scroll</span><i></i></div>
         <div class="hero__progress" aria-hidden="true"><span></span></div>
@@ -112,9 +108,8 @@
       </div>
     </section>
 
-    <div class="floor" aria-hidden="true">
-      <div class="floor__slab"></div>
-      <p class="floor__label mono"><span class="floor__no">FL 05</span><span class="floor__name">About</span></p>
+    <div class="chapter" aria-hidden="true">
+      <p class="chapter__label mono"><span class="chapter__no">01</span><span class="chapter__name">About</span></p>
     </div>
 
     <!-- C. About -->
@@ -144,9 +139,8 @@
       </div>
     </section>
 
-    <div class="floor" aria-hidden="true">
-      <div class="floor__slab"></div>
-      <p class="floor__label mono"><span class="floor__no">FL 04</span><span class="floor__name">Selected work</span></p>
+    <div class="chapter" aria-hidden="true">
+      <p class="chapter__label mono"><span class="chapter__no">02</span><span class="chapter__name">Selected work</span></p>
     </div>
 
     <!-- D. Selected work -->
@@ -169,9 +163,8 @@
       <div class="work__scenes"></div>
     </section>
 
-    <div class="floor" aria-hidden="true">
-      <div class="floor__slab"></div>
-      <p class="floor__label mono"><span class="floor__no">FL 03</span><span class="floor__name">Process</span></p>
+    <div class="chapter" aria-hidden="true">
+      <p class="chapter__label mono"><span class="chapter__no">03</span><span class="chapter__name">Process</span></p>
     </div>
 
     <!-- E. Process -->
@@ -203,9 +196,8 @@
       </div>
     </section>
 
-    <div class="floor" aria-hidden="true">
-      <div class="floor__slab"></div>
-      <p class="floor__label mono"><span class="floor__no">FL 02</span><span class="floor__name">Experience</span></p>
+    <div class="chapter" aria-hidden="true">
+      <p class="chapter__label mono"><span class="chapter__no">04</span><span class="chapter__name">Experience</span></p>
     </div>
 
     <!-- F. Experience -->
@@ -228,9 +220,8 @@
       </div>
     </section>
 
-    <div class="floor" aria-hidden="true">
-      <div class="floor__slab"></div>
-      <p class="floor__label mono"><span class="floor__no">FL 01</span><span class="floor__name">Toolkit</span></p>
+    <div class="chapter" aria-hidden="true">
+      <p class="chapter__label mono"><span class="chapter__no">05</span><span class="chapter__name">Toolkit</span></p>
     </div>
 
     <!-- G. Toolkit -->
@@ -260,19 +251,12 @@
       </div>
     </section>
 
-    <div class="floor" aria-hidden="true">
-      <div class="floor__slab"></div>
-      <p class="floor__label mono"><span class="floor__no">G</span><span class="floor__name">Ground</span></p>
+    <div class="chapter" aria-hidden="true">
+      <p class="chapter__label mono"><span class="chapter__no">06</span><span class="chapter__name">Contact</span></p>
     </div>
 
-    <!-- H. Contact: the landing -->
+    <!-- H. Contact -->
     <section class="section contact on-dark" id="contact" aria-labelledby="contact-title">
-      <div class="landing" aria-hidden="true">
-        <img class="landing__img" src="assets/scenes/land.jpg" alt="" width="1680" height="944" loading="lazy" decoding="async">
-        <div class="landing__ripples"><i></i><i></i><i></i></div>
-        <div class="landing__flash"></div>
-        <div class="landing__shade"></div>
-      </div>
       <div class="wrap">
         <header class="sheet" style="margin-bottom:0">
           <div class="sheet__meta">

@@ -506,7 +506,7 @@ ul, ol { padding: 0; list-style: none; }
   height: 100%;
   object-fit: cover;
 }
-.hero__poster { will-change: transform, opacity; }
+.hero__poster { transition: opacity .8s var(--ease); }
 .hero__poster.is-hidden { opacity: 0; }
 .hero__canvas { display: block; }
 .static .hero__canvas { display: none; }
@@ -627,148 +627,91 @@ ul, ol { padding: 0; list-style: none; }
 .hero__progress span { display: block; height: 100%; background: var(--snow); transform-origin: 0 50%; transform: scaleX(0); }
 
 /* --------------------------------------------------------------------------
-   The descent: leap (hero) → fall (between floors) → landing (contact)
+   The world: a 3D point cloud of the hero photograph behind the whole page.
+   Sections float over it as frosted glass; the gaps between them are chapters
+   where the scene shows through.
    -------------------------------------------------------------------------- */
 
-/* every section is a floor slab; the gaps between them look out onto the fall */
 #main { position: relative; z-index: 1; }
-#main > .section:not(.on-dark) { background: var(--stone); }
-.motion .hero { background: transparent; }
-
-.descent {
+.world {
   position: fixed;
   inset: 0;
   z-index: -1;
-  overflow: hidden;
-  background: #9FB6C9;
-  pointer-events: none;
-}
-.descent__img {
-  position: absolute;
-  left: 0; top: 0;
   width: 100%;
-  height: 130%;
-  max-width: none;
-  object-fit: cover;
-  will-change: transform;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  /* matches the photograph's edges if the camera ever looks past them */
+  background: linear-gradient(180deg, #4F86C6 0%, #8FB4DB 42%, #B9C9D6 62%, #33475A 72%, #15212C 100%);
+  opacity: 0;
+  transition: opacity 1s var(--ease);
 }
-/* wind streaks, scrolled by --fall and faded in by --speed (both set from JS) */
-.descent__speed, .hero__speed {
-  position: absolute;
-  inset: -20% 0;
-  opacity: calc(.12 + var(--speed, 0) * .7);
-  background-image:
-    repeating-linear-gradient(90deg, transparent 0 46px, rgba(255, 255, 255, .55) 46px 47px, transparent 47px 131px, rgba(255, 255, 255, .3) 131px 132px, transparent 132px 197px);
-  background-size: 197px 340px;
-  background-position: 0 var(--fall, 0px);
-  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 90px, transparent 90px 340px);
-  mask-image: repeating-linear-gradient(180deg, #000 0 90px, transparent 90px 340px);
-  mix-blend-mode: soft-light;
-}
-.hero__speed { opacity: calc(var(--speed, 0) * .8); }
-.descent__alt {
-  position: absolute;
-  right: var(--pad);
-  top: 50%;
-  transform: translateY(-50%) rotate(90deg);
-  transform-origin: 100% 50%;
-  color: var(--snow);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .18em;
-  text-shadow: 0 1px 10px rgba(16, 24, 31, .4);
-}
+.world.is-live { opacity: 1; }
+.static .world { display: none; }
+.motion .hero { background: transparent; }
+/* the hero is wrapped by its pin-spacer, so the flag lives on <html> */
+.world-live .hero__poster { opacity: 0; transition: opacity 1.2s var(--ease) .3s; }
 
-.floor {
-  position: relative;
-  height: 72vh;
-  height: 72svh;
-  min-height: 360px;
-  overflow: hidden;
-  color: var(--snow);
-}
-.floor__slab::before, .floor__slab::after {
+/* glass, after glassmorphic_ui_kit: blur 10–24, white 20% → 10% gradient, thin light border.
+   The frost lives on a pseudo-element so pinned children keep the viewport as their containing block. */
+.motion #main > .section { background: transparent; isolation: isolate; }
+.motion #main > .section::before {
   content: "";
   position: absolute;
-  left: 0; right: 0;
-  height: 18px;
-  background: linear-gradient(180deg, rgba(16, 24, 31, .28), rgba(16, 24, 31, 0));
+  inset: 0 clamp(8px, 1.2vw, 20px);
+  z-index: -1;
+  border-radius: clamp(18px, 2vw, 32px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .7) 0%, rgba(255, 255, 255, .52) 100%);
+  border: 1px solid rgba(255, 255, 255, .7);
+  box-shadow: 0 40px 90px -50px rgba(16, 24, 31, .45), inset 0 1px 0 rgba(255, 255, 255, .9);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
 }
-.floor__slab::before { top: 0; }
-.floor__slab::after { bottom: 0; transform: scaleY(-1); }
-.floor__label {
+.motion #main > .section.on-dark::before {
+  background: linear-gradient(135deg, rgba(27, 39, 48, .78) 0%, rgba(27, 39, 48, .6) 100%);
+  border-color: rgba(255, 255, 255, .16);
+  box-shadow: 0 40px 90px -50px rgba(16, 24, 31, .6), inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+
+.chapter {
+  position: relative;
+  height: 64vh;
+  height: 64svh;
+  min-height: 320px;
+  color: var(--snow);
+}
+.static .chapter { display: none; }
+.chapter__label {
   position: absolute;
   left: var(--pad);
   bottom: clamp(28px, 6vh, 64px);
-  display: flex;
-  align-items: baseline;
-  gap: 18px;
-  text-shadow: 0 2px 24px rgba(16, 24, 31, .45);
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px 12px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, .12));
+  border: 1px solid rgba(255, 255, 255, .45);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+  box-shadow: 0 18px 40px -24px rgba(16, 24, 31, .5);
+  text-shadow: 0 1px 10px rgba(16, 24, 31, .35);
 }
-.floor__no {
-  font-family: var(--f-display);
-  font-weight: 500;
-  font-size: clamp(4rem, 11vw, 10rem);
-  line-height: .9;
-  letter-spacing: -.05em;
-}
-.floor__name { font-size: clamp(.875rem, 1.2vw, 1.125rem); font-weight: 500; letter-spacing: .2em; text-transform: uppercase; }
-
-/* contact is the landing */
-.contact { overflow: hidden; isolation: isolate; }
-.contact > .wrap { position: relative; z-index: 2; }
-.landing { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.landing__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  object-fit: cover;
-  object-position: 62% 50%;
-  transform-origin: 62% 80%;
-}
-.landing__shade {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(27, 39, 48, .9) 0%, rgba(27, 39, 48, .7) 42%, rgba(27, 39, 48, .2) 100%),
-    linear-gradient(0deg, rgba(27, 39, 48, .6) 0%, rgba(27, 39, 48, 0) 40%);
-}
-.landing__ripples { position: absolute; left: 62%; top: 82%; }
-.landing__ripples i {
-  position: absolute;
-  left: -60px; top: -18px;
-  width: 120px; height: 36px;
-  border: 2px solid rgba(255, 255, 255, .8);
+.chapter__no {
+  display: grid;
+  place-items: center;
+  width: 38px; height: 38px;
   border-radius: 50%;
-  opacity: 0;
+  background: rgba(255, 255, 255, .9);
+  color: var(--ink);
+  text-shadow: none;
+  font-variant-numeric: tabular-nums;
 }
-.landing__flash { position: absolute; inset: 0; background: #FFF4E6; opacity: 0; }
-.contact.is-landed .landing { animation: impact .6s cubic-bezier(.2, .8, .3, 1) both; }
-.contact.is-landed .landing__ripples i { animation: ripple 1.6s cubic-bezier(.1, .7, .3, 1) both; }
-.contact.is-landed .landing__ripples i:nth-child(2) { animation-delay: .14s; }
-.contact.is-landed .landing__ripples i:nth-child(3) { animation-delay: .3s; }
-.contact.is-landed .landing__flash { animation: flash .5s ease-out both; }
-@keyframes impact {
-  0% { transform: translate3d(0, 0, 0) scale(1.04); }
-  18% { transform: translate3d(-6px, 9px, 0) scale(1.02); }
-  36% { transform: translate3d(5px, -5px, 0) scale(1.01); }
-  58% { transform: translate3d(-2px, 2px, 0) scale(1); }
-  100% { transform: none; }
-}
-@keyframes ripple { 0% { opacity: .9; transform: scale(.2); } 100% { opacity: 0; transform: scale(9); } }
-@keyframes flash { 0% { opacity: .55; } 100% { opacity: 0; } }
+.chapter__name { font-size: clamp(.875rem, 1.2vw, 1.0625rem); font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
 
 @media (max-width: 767px) {
-  .floor { height: 52vh; height: 52svh; min-height: 280px; }
-  .descent__alt { display: none; }
-  .landing__img { object-position: 70% 50%; }
-  .hero__poster { object-position: 64% 50%; }
-  .descent__img { object-position: 45% 50%; }
+  .chapter { height: 46vh; height: 46svh; min-height: 260px; }
 }
-
-.static .descent__speed, .static .hero__speed { display: none; }
-.static .descent__img { height: 100%; }
 
 /* blocks 2–4 start hidden when motion is on; GSAP reveals them */
 .motion .hero__block--2, .motion .hero__block--3, .motion .hero__block--4 { opacity: 0; }
