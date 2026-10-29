@@ -124,6 +124,7 @@
               <li><a href="${navHref("#about")}">About</a></li>
               <li><a href="${navHref("#experience")}">Experience</a></li>
               <li><a href="${navHref("#contact")}">Contact</a></li>
+              <li><a href="${ROOT}journey.html">3D ride</a></li>
             </ul>
           </nav>
           <a class="btn btn--solid btn--sm btn--resume" href="${esc(S.links.resume)}" ${ext}>Resume<span class="sr-only"> (opens in a new tab)</span></a>
@@ -148,6 +149,7 @@
           <li><a href="${navHref("#about")}"><span class="mono">03</span>About</a></li>
           <li><a href="${navHref("#experience")}"><span class="mono">04</span>Experience</a></li>
           <li><a href="${navHref("#contact")}"><span class="mono">05</span>Contact</a></li>
+          <li><a href="${ROOT}journey.html"><span class="mono">06</span>3D ride</a></li>
         </ul>
         <div class="mobile-menu__foot">
           <a class="btn btn--solid" href="${esc(S.links.resume)}" ${ext}>Resume<span class="sr-only"> (opens in a new tab)</span></a>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dinesh Kumar · A ride through Chennai</title>
+  <meta name="description" content="A 3D scroll ride through a low-poly Chennai: Dinesh Kumar's about, case studies, experience and contact, stop by stop.">
+  <meta name="theme-color" content="#F4C9A4">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Dinesh Kumar">
+  <meta property="og:title" content="Dinesh Kumar · A ride through Chennai">
+  <meta property="og:description" content="Senior UI/UX & Product Designer in Chennai. Take the 3D ride through the work.">
+  <meta property="og:url" content="https://dineshkarthi12.github.io/Modern-UXPortfolio/journey.html">
+  <meta property="og:image" content="https://dineshkarthi12.github.io/Modern-UXPortfolio/assets/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="css/journey.css?v=20261029a">
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+  <script defer src="js/data.js?v=20261029a"></script>
+  <script type="module" src="js/journey.js?v=20261029a"></script>
+  <script>
+    /* If three.js never arrives (offline, blocked CDN), say so instead of loading forever. */
+    setTimeout(function () {
+      var b = document.querySelector(".gate__start");
+      if (b && b.disabled) { document.querySelector(".gate__error").hidden = false; }
+    }, 30000);
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="index.html">Skip the ride: open the classic portfolio</a>
+
+  <!-- Start screen: progress while the city is built, then a button to enter. -->
+  <div class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+    <div class="gate__inner">
+      <p class="mono gate__label">N 13.08° · E 80.27° · Chennai</p>
+      <h1 class="gate__title" id="gate-title">Dinesh Kumar</h1>
+      <p class="gate__line">Senior UI/UX &amp; Product Designer. Hop in the auto, the tour starts on Marina Beach.</p>
+      <div class="gate__progress mono" aria-live="polite"><span class="gate__pct">000</span><span>Building the city</span></div>
+      <button class="gate__start" type="button" disabled>Start the ride</button>
+      <a class="gate__classic mono" href="index.html">Or open the classic site →</a>
+    </div>
+    <p class="gate__error" hidden>Your browser can’t draw the 3D city (WebGL is off or unsupported). <a href="index.html">Open the classic portfolio</a> instead.</p>
+  </div>
+
+  <!-- Brush-stroke reveal: paths paint holes in this cover to show the city. -->
+  <svg class="brush" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <mask id="brush-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="1000">
+        <rect width="1600" height="1000" fill="#fff"/>
+        <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
+          <path pathLength="1" stroke-width="170" d="M720 160 C 820 120, 940 170, 900 260"/>
+          <path pathLength="1" stroke-width="210" d="M560 340 C 700 260, 900 300, 1080 220"/>
+          <path pathLength="1" stroke-width="260" d="M480 520 C 640 420, 880 600, 1140 430"/>
+          <path pathLength="1" stroke-width="320" d="M380 760 C 620 600, 980 800, 1240 620"/>
+          <path pathLength="1" stroke-width="420" d="M120 980 C 500 820, 1100 1000, 1560 760"/>
+          <path pathLength="1" stroke-width="520" d="M60 260 C 400 60, 1200 120, 1580 300"/>
+          <path pathLength="1" stroke-width="700" d="M-100 560 C 400 380, 1200 700, 1760 420"/>
+        </g>
+      </mask>
+    </defs>
+    <rect width="1600" height="1000" fill="#F4C9A4" mask="url(#brush-mask)"/>
+  </svg>
+
+  <canvas class="scene" aria-hidden="true"></canvas>
+
+  <header class="bar">
+    <a class="bar__home" href="index.html" aria-label="Dinesh Kumar, classic portfolio">
+      <span class="bar__mark" aria-hidden="true">DK</span><span class="bar__name">Dinesh Kumar</span>
+    </a>
+    <div class="bar__right">
+      <span class="mono bar__pct" aria-hidden="true">000%</span>
+      <a class="bar__classic mono" href="index.html">Classic view</a>
+    </div>
+  </header>
+
+  <nav class="stops" aria-label="Tour stops"><ol></ol></nav>
+
+  <!-- Panels are filled from js/data.js and shown when the ride reaches their stop. -->
+  <main id="main" class="panels"></main>
+
+  <div class="hint mono" aria-hidden="true"><span>Scroll to ride</span><i></i></div>
+
+  <!-- Scroll length for the ride. -->
+  <div class="track" aria-hidden="true"></div>
+
+  <noscript>
+    <div class="noscript">
+      <p>This 3D tour needs JavaScript. <a href="index.html">Open the classic portfolio</a>.</p>
+    </div>
+  </noscript>
+</body>
+</html>
