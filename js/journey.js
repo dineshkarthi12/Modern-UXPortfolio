@@ -189,24 +189,24 @@ function buildGround() {
   scene.add(dashes);
 }
 
-// Marina Beach: sand strip and an animated sea to the left of the About stop.
-function buildBeach() {
-  const { p, t, right } = frameAt(0.19);
-  const ang = Math.atan2(t.x, t.z);
-  const left = right.clone().multiplyScalar(-1);
+// Marina Beach: a sand strip and an animated sea along the whole west side.
+// The road never goes further west than x = -10.4, so both stay clear of it.
+const BEACH = { shore: -14, water: -44, north: 220, south: -480 };
 
-  const sand = new THREE.Mesh(new THREE.PlaneGeometry(40, 260), mat(C.sand));
+function buildBeach() {
+  const { p, t } = frameAt(0.19);
+  const len = BEACH.north - BEACH.south, midZ = (BEACH.north + BEACH.south) / 2;
+
+  const sand = new THREE.Mesh(new THREE.PlaneGeometry(BEACH.shore - BEACH.water, len), mat(C.sand));
   sand.rotation.x = -Math.PI / 2;
-  sand.rotation.z = ang;
-  sand.position.copy(p).addScaledVector(left, 26).setY(0.01);
+  sand.position.set((BEACH.shore + BEACH.water) / 2, 0.01, midZ);
   sand.receiveShadow = true;
   scene.add(sand);
 
-  const geo = new THREE.PlaneGeometry(260, 420, small ? 30 : 60, small ? 50 : 100);
+  const geo = new THREE.PlaneGeometry(300, len, small ? 30 : 60, small ? 80 : 160);
   geo.rotateX(-Math.PI / 2);
   sea = new THREE.Mesh(geo, mat(C.sea, { roughness: 0.35, metalness: 0.1 }));
-  sea.rotation.y = ang;
-  sea.position.copy(p).addScaledVector(left, 46 + 130).setY(0.6);
+  sea.position.set(BEACH.water - 150, 0.6, midZ);
   sea.receiveShadow = true;
   seaBase = Float32Array.from(geo.attributes.position.array);
   scene.add(sea);
@@ -230,7 +230,7 @@ function buildBeach() {
   const glow = new THREE.PointLight("#FFC860", 30, 40, 2);
   glow.position.y = bands * 3.4 + 1.4;
   lh.add(glow);
-  lh.position.copy(p).addScaledVector(left, 16).addScaledVector(t, 10);
+  lh.position.copy(p).addScaledVector(t, 10).setX(BEACH.shore - 9);
   scene.add(shadowy(lh));
   return lh.position.clone();
 }
@@ -470,13 +470,7 @@ function buildCity(avoid) {
     return Math.sqrt(d);
   };
   const near = (x, z, r) => avoid.some((a) => (a.x - x) ** 2 + (a.z - z) ** 2 < r * r);
-  const beach = frameAt(0.19);
-  const onBeach = (x, z) => {
-    const dx = x - beach.p.x, dz = z - beach.p.z;
-    const along = dx * beach.t.x + dz * beach.t.z;
-    const across = -(dx * beach.right.x + dz * beach.right.z);
-    return across > 2 && Math.abs(along) < 140;
-  };
+  const onBeach = (x) => x < BEACH.shore + 1;
 
   let seed = 7;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -490,7 +484,7 @@ function buildCity(avoid) {
     const off = 10 + rnd() * 70;
     const x = p.x + right.x * side * off + t.x * (rnd() - 0.5) * 6;
     const z = p.z + right.z * side * off + t.z * (rnd() - 0.5) * 6;
-    if (roadDist(x, z) < 9 || near(x, z, 16) || onBeach(x, z)) continue;
+    if (roadDist(x, z) < 9 || near(x, z, 16) || onBeach(x)) continue;
     const w = 4 + rnd() * 6, d = 4 + rnd() * 6;
     const h = 3 + rnd() * rnd() * 16;
     if (boxes.some((b) => Math.abs(b.x - x) < (b.w + w) / 2 + 0.6 && Math.abs(b.z - z) < (b.d + d) / 2 + 0.6)) continue;
@@ -537,19 +531,16 @@ function buildCity(avoid) {
 
   // Coconut palms: along the beach and scattered between buildings.
   const palms = [];
-  for (let i = 0; i < 40; i++) {
-    const along = -120 + i * 6 + rnd() * 3;
-    const across = 5 + rnd() * 10;
-    palms.push(new THREE.Vector3(
-      beach.p.x + beach.t.x * along - beach.right.x * across, 0,
-      beach.p.z + beach.t.z * along - beach.right.z * across));
+  for (let i = 0; i < 60; i++) {
+    const v = new THREE.Vector3(BEACH.shore - 3 - rnd() * 22, 0, 60 - i * 7 + rnd() * 4);
+    if (!near(v.x, v.z, 8)) palms.push(v);
   }
   for (let i = 0; palms.length < (small ? 110 : 180) && i < 2000; i++) {
     const { p, right } = frameAt(rnd());
     const side = rnd() < 0.5 ? -1 : 1;
     const off = 6 + rnd() * 4;
     const v = new THREE.Vector3(p.x + right.x * side * off, 0, p.z + right.z * side * off);
-    if (near(v.x, v.z, 10) || onBeach(v.x, v.z)) continue;
+    if (near(v.x, v.z, 10) || onBeach(v.x)) continue;
     palms.push(v);
   }
   const trunkGeo = new THREE.CylinderGeometry(0.18, 0.3, 1, 6);
