@@ -280,109 +280,23 @@
   }
 
   /* ======================================================================
-     Hero — frame sequence
+     Hero — the leap
      ====================================================================== */
+
+  const ALT_TOP = 312;     // metres on the rooftop
+  const ALT_LEAP = 268;    // metres when the hero hands over to the fall
 
   function initHero() {
     const hero = $(".hero");
-    const canvas = $(".hero__canvas");
-    const ctx = canvas.getContext("2d");
     const poster = $(".hero__poster");
-    const frameLabel = $(".hero__frame");
+    const altLabel = $(".hero__frame");
     const heroBar = $(".hero__progress span");
     const loader = $(".loader");
     const pctEl = $(".loader__pct");
     const loaderBar = $(".loader__bar span");
-
     const mobile = window.matchMedia("(max-width: 767px)").matches;
-    const COUNT = mobile ? 120 : 240;
-    const DIR = mobile ? "mobile" : "desktop";
-    const FIRST = Math.min(40, COUNT);
-    const src = (i) => `assets/frames/${DIR}/${String(i + 1).padStart(4, "0")}.webp`;
 
-    const frames = new Array(COUNT);
-    const ready = new Uint8Array(COUNT);
-    let current = 0;
-    let drawn = -1;
-    let firstDrawn = false;
-    let raf = 0;
-
-    /* --- drawing --- */
-    function size() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      canvas.width = Math.max(1, Math.round(w * dpr));
-      canvas.height = Math.max(1, Math.round(h * dpr));
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
-      drawn = -1;
-      schedule();
-    }
-
-    function nearest(i) {
-      if (ready[i]) return i;
-      for (let d = 1; d < COUNT; d++) {
-        if (i - d >= 0 && ready[i - d]) return i - d;
-        if (i + d < COUNT && ready[i + d]) return i + d;
-      }
-      return -1;
-    }
-
-    function schedule() { if (!raf) raf = requestAnimationFrame(render); }
-
-    function render() {
-      raf = 0;
-      const k = nearest(current);
-      if (k < 0 || k === drawn) return;
-      const img = frames[k];
-      const cw = canvas.width, ch = canvas.height;
-      const ir = img.naturalWidth / img.naturalHeight;
-      const cr = cw / ch;
-      let dw, dh;
-      if (cr > ir) { dw = cw; dh = cw / ir; } else { dh = ch; dw = ch * ir; }
-      ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
-      drawn = k;
-      frameLabel.textContent = `Fr. ${String(k + 1).padStart(3, "0")} / ${COUNT}`;
-      if (!firstDrawn && k === 0) {
-        firstDrawn = true;
-        poster.classList.add("is-hidden");
-      }
-    }
-
-    /* --- loading --- */
-    function load(i) {
-      return new Promise((resolve) => {
-        if (frames[i]) return resolve();
-        const img = new Image();
-        img.decoding = "async";
-        img.onload = () => {
-          ready[i] = 1;
-          if (Math.abs(i - current) < 3 || !firstDrawn) { drawn = -1; schedule(); }
-          resolve();
-        };
-        img.onerror = () => resolve();
-        img.src = src(i);
-        frames[i] = img;
-      });
-    }
-
-    async function loadList(list, concurrency, onEach) {
-      let k = 0;
-      const worker = async () => {
-        while (k < list.length) {
-          const i = list[k++];
-          await load(i);
-          onEach && onEach();
-        }
-      };
-      await Promise.all(Array.from({ length: concurrency }, worker));
-    }
-
-    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
-
-    /* --- scroll timeline --- */
-    const state = { frame: 0 };
+    const state = { alt: ALT_TOP };
     const counters = $$(".hero__stat-num");
     const count = { v: 0 };
     const b1 = $('[data-block="1"]'), b2 = $('[data-block="2"]'), b3 = $('[data-block="3"]'), b4 = $('[data-block="4"]');
@@ -397,7 +311,7 @@
       scrollTrigger: {
         trigger: hero,
         start: "top top",
-        end: () => "+=" + window.innerHeight * (mobile ? 2 : 4),
+        end: () => "+=" + window.innerHeight * (mobile ? 2 : 3.5),
         pin: true,
         scrub: 0.5,
         invalidateOnRefresh: true,
@@ -408,12 +322,12 @@
       }
     });
 
+    // the camera follows the dive, then the rooftop falls away to the facade behind
+    tl.fromTo(poster, { scale: 1, yPercent: 0 }, { scale: 1.3, yPercent: 7, duration: 0.82, ease: "power1.in" }, 0);
+    tl.to(poster, { autoAlpha: 0, duration: 0.1, ease: "power1.inOut" }, 0.78);
     tl.to(state, {
-      frame: COUNT - 1, duration: 1,
-      onUpdate: () => {
-        const f = Math.round(state.frame);
-        if (f !== current) { current = f; schedule(); }
-      }
+      alt: ALT_LEAP, duration: 1,
+      onUpdate: () => { altLabel.textContent = `ALT ${Math.round(state.alt)} m`; }
     }, 0);
 
     // 0–15%: name
@@ -437,24 +351,25 @@
       }
     });
 
-    window.addEventListener("resize", size);
-    size();
-
-    /* --- loader → reveal → background loading --- */
+    /* --- loader: wait for the three scenes, then reveal --- */
     DK.lenis && DK.lenis.stop();
+    const scenes = [poster, $(".descent__img"), $(".landing__img")];
     let n = 0;
-    const firstList = Array.from({ length: FIRST }, (_, i) => i);
+    const loaded = (img) => new Promise((resolve) => {
+      img.loading = "eager";
+      const done = () => {
+        n++;
+        pctEl.textContent = Math.round((n / scenes.length) * 100) + "%";
+        loaderBar.style.transform = `scaleX(${n / scenes.length})`;
+        resolve();
+      };
+      if (img.complete && img.naturalWidth) return done();
+      img.addEventListener("load", done, { once: true });
+      img.addEventListener("error", done, { once: true });
+    });
     const timeout = new Promise((r) => setTimeout(r, 9000));
 
-    Promise.race([
-      loadList(firstList, 6, () => {
-        n++;
-        const pct = Math.round((n / FIRST) * 100);
-        pctEl.textContent = pct + "%";
-        loaderBar.style.transform = `scaleX(${n / FIRST})`;
-      }),
-      timeout
-    ]).then(() => {
+    Promise.race([Promise.all(scenes.map(loaded)), timeout]).then(() => {
       loader.classList.add("is-done");
       document.documentElement.classList.add("loaded");
       DK.lenis && DK.lenis.start();
@@ -464,10 +379,67 @@
       gsap.from($$(".hero__label, .hero__name, .hero__line", b1), {
         y: 36, autoAlpha: 0, duration: 1.2, ease: "power3.out", stagger: 0.12, delay: 0.15
       });
+    });
+  }
 
-      const rest = [];
-      for (let i = FIRST; i < COUNT; i++) rest.push(i);
-      idle(() => loadList(rest, 4));
+  /* ======================================================================
+     The fall — seen between floors — and the landing at contact
+     ====================================================================== */
+
+  function initDescent() {
+    const root = document.documentElement;
+    const img = $(".descent__img");
+    const alt = $(".descent__alt b");
+    const contact = $("#contact");
+    const state = { alt: ALT_LEAP };
+
+    // the facade streams upward and the altitude runs out between the hero and the ground
+    gsap.timeline({
+      defaults: { ease: "none" },
+      scrollTrigger: {
+        trigger: "#about",
+        start: "top bottom",
+        endTrigger: contact,
+        end: "top top",
+        scrub: 0.6
+      }
+    })
+      .fromTo(img, { yPercent: 0, rotation: -1.5 }, { yPercent: -23, rotation: 1.5, duration: 1 }, 0)
+      .to(state, { alt: 0, duration: 1, onUpdate: () => { alt.textContent = Math.round(state.alt); } }, 0);
+
+    // wind: streaks speed up with the scroll and settle when it stops
+    let target = 0, speed = 0, fall = 0;
+    ScrollTrigger.create({
+      start: 0,
+      end: "max",
+      onUpdate: (self) => { target = Math.min(1, Math.abs(self.getVelocity()) / 2600); }
+    });
+    gsap.ticker.add(() => {
+      target *= 0.92;
+      speed += (target - speed) * 0.12;
+      fall += 4 + speed * 60;
+      root.style.setProperty("--speed", speed.toFixed(3));
+      root.style.setProperty("--fall", (-fall % 340).toFixed(1) + "px");
+    });
+
+    // floor numbers rise into view as each storey goes past
+    $$(".floor__label").forEach((label) => {
+      gsap.fromTo(label, { yPercent: 80, autoAlpha: 0 }, {
+        yPercent: 0, autoAlpha: 1, ease: "none",
+        scrollTrigger: { trigger: label.parentElement, start: "top 80%", end: "center 50%", scrub: 0.6 }
+      });
+    });
+
+    // landing: the street rushes up, then impact
+    gsap.fromTo(".landing__img", { scale: 1.35, yPercent: -10 }, {
+      scale: 1, yPercent: 0, ease: "power2.in",
+      scrollTrigger: { trigger: contact, start: "top bottom", end: "top 30%", scrub: 0.5 }
+    });
+    ScrollTrigger.create({
+      trigger: contact,
+      start: "top 30%",
+      onEnter: () => contact.classList.add("is-landed"),
+      onLeaveBack: () => contact.classList.remove("is-landed")
     });
   }
 
@@ -694,6 +666,7 @@
 
   if (motion) {
     initHero();
+    initDescent();
     initAbout();
     initWork();
     initProcess();
